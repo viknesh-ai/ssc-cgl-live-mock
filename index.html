@@ -31,6 +31,21 @@ input{padding:11px;border:1px solid #cbd5e1;border-radius:7px;width:100%;font-si
 .monitor{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#f8fafc;border-radius:8px;padding:12px}.stat b{display:block;font-size:20px;margin-top:3px}
 .live{color:#166534;font-weight:800}.waiting{color:#92400e;font-weight:800}
 table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left}
+.gridwrap{overflow-x:auto;padding-bottom:4px}
+.grid25{display:grid;grid-template-columns:repeat(25,minmax(26px,1fr));gap:4px;min-width:700px}
+.cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border-radius:4px;background:#e2e8f0;color:#64748b}
+.cell.correct{background:#166534;color:#fff}.cell.wrong{background:#b91c1c;color:#fff}
+.cell.cur{outline:3px solid #f59e0b;outline-offset:1px}
+.seclabel{font-size:13px;font-weight:800;margin:14px 0 7px;color:#334155}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#64748b;margin-top:12px;align-items:center}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.candlist{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.candbtn{background:#e2e8f0;color:#334155;padding:8px 13px;border-radius:7px;font-size:13px}
+.candbtn.sel{background:#172554;color:#fff}
+.livefeed{background:#f8fafc;border-radius:8px;padding:14px;margin-top:12px;line-height:1.6}
+.livefeed .qtext{font-weight:650;margin-bottom:9px}
+.pick{display:inline-block;padding:3px 9px;border-radius:5px;font-weight:800;font-size:13px}
+.pick.correct{background:#dcfce7;color:#166534}.pick.wrong{background:#fee2e2;color:#b91c1c}.pick.none{background:#e2e8f0;color:#64748b}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.monitor{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -71,6 +86,21 @@ table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px so
       <div class="actions" style="margin-top:15px">
         <button class="green" id="startBtn" onclick="startRoom()" disabled>Start Exam</button>
         <button class="danger" id="finishBtn" onclick="finishRoom()" disabled>End Exam</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Candidates</h3>
+      <div id="candList" class="candlist"><span class="small">No one has joined yet.</span></div>
+    </div>
+    <div class="card">
+      <h3>Live Answering</h3>
+      <div id="liveFeed" class="livefeed"><span class="small">Waiting for the candidate to start answering.</span></div>
+      <div id="answerGrid"></div>
+      <div class="legend">
+        <span><i class="dot" style="background:#166534"></i>Correct</span>
+        <span><i class="dot" style="background:#b91c1c"></i>Wrong</span>
+        <span><i class="dot" style="background:#e2e8f0"></i>Not answered</span>
+        <span><i class="dot" style="background:#fff;outline:3px solid #f59e0b"></i>Currently on</span>
       </div>
     </div>
     <div class="card">
@@ -132,9 +162,16 @@ const SECTIONS = [
  "English Language & Comprehension"
 ];
 
+// questions.js ships the bank shuffled, but the exam runs four fixed 25-question
+// sections. Regroup into section order so labels and section scores line up.
+if(Array.isArray(window.QUESTIONS)){
+  const grouped=SECTIONS.flatMap(s=>window.QUESTIONS.filter(q=>q.sec===s));
+  if(grouped.length===window.QUESTIONS.length) window.QUESTIONS=grouped;
+}
+
 let roomId = new URLSearchParams(location.search).get("room");
 let adminMode = new URLSearchParams(location.search).get("admin") === "1";
-let user = null, roomData = null, candidateId = null, candidateData = null;
+let user = null, roomData = null, candidateId = null, candidateData = null, selectedCandidate = null;
 let section = 0, localQ = 0, answers = {}, reviews = {};
 let timerHandle = null;
 
@@ -156,13 +193,25 @@ async function boot(){
     $("joinBtn").onclick=joinCandidate;
   } else {
     $("setupTitle").textContent="SSC CGL Tier-I Live Mock";
-    $("setupBody").innerHTML=`<p>Use <b>?admin=1</b> to open the examiner dashboard.</p><p>Or open a candidate room link sent by the examiner.</p>`;
+    $("setupBody").innerHTML=`<p class="small">Candidates: open the room link the examiner sent you.</p><div class="actions"><button class="primary" id="toAdmin">Examiner Login</button></div>`;
+    $("toAdmin").onclick=()=>{location.search="?admin=1"};
   }
 }
 async function adminLogin(){
   try{
     const c=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
     user=c.user; hide("setup"); show("examiner");
+    // Reattach to a room still in progress so a refresh doesn't strand the examiner.
+    const prior=roomId||localStorage.getItem("sscRoomId");
+    if(prior){
+      const snap=await get(ref(db,"rooms/"+prior));
+      if(snap.exists()&&snap.val()?.status!=="finished"){
+        roomId=prior;
+        $("roomCode").textContent=roomId;
+        $("roomUrl").value=location.origin+location.pathname+"?room="+roomId;
+        watchRoomForAdmin();
+      }else localStorage.removeItem("sscRoomId");
+    }
   }catch(e){err("Login failed: "+e.message)}
 }
 async function joinCandidate(){
@@ -182,6 +231,8 @@ async function createRoom(){
   for(let i=0;i<6;i++)code+=chars[Math.floor(Math.random()*chars.length)];
   roomId=code;
   await set(ref(db,"rooms/"+roomId),{status:"waiting",createdAt:Date.now(),startAt:null,finishedAt:null});
+  localStorage.setItem("sscRoomId",roomId);
+  selectedCandidate=null;
   $("roomCode").textContent=roomId;
   $("roomUrl").value=location.origin+location.pathname+"?room="+roomId;
   $("startBtn").disabled=false; $("finishBtn").disabled=false;
@@ -203,8 +254,13 @@ function watchRoomForAdmin(){
     roomData=snap.val()||{};
     $("roomStatus").textContent=roomData.status||"—";
     const cs=roomData.candidates||{}; const ids=Object.keys(cs);
-    if(ids.length){candidateId=ids[0]; candidateData=cs[candidateId];}
-    else candidateData=null;
+    // Keep the examiner's chosen candidate selected across live updates.
+    if(!ids.includes(selectedCandidate)) selectedCandidate=ids[0]||null;
+    candidateId=selectedCandidate;
+    candidateData=candidateId?cs[candidateId]:null;
+    renderCandidateList(cs,ids);
+    renderLiveFeed(candidateData);
+    renderAnswerGrid(candidateData);
     $("candidateName").textContent=candidateData?.name||"—";
     $("candidateSection").textContent=candidateData ? SECTIONS[candidateData.section] : "—";
     $("candidateQuestion").textContent=candidateData ? `${(candidateData.question||0)+1}/25` : "—";
@@ -219,6 +275,51 @@ function watchRoomForAdmin(){
     $("startBtn").disabled=roomData.status!=="waiting";
     $("finishBtn").disabled=roomData.status!=="running";
   });
+}
+function renderCandidateList(cs,ids){
+  if(!ids.length){$("candList").innerHTML=`<span class="small">No one has joined yet.</span>`;return}
+  $("candList").innerHTML=ids.map(id=>{
+    const n=cs[id]?.name||"Unnamed";
+    const att=Object.keys(cs[id]?.answers||{}).length;
+    return `<button class="candbtn ${id===selectedCandidate?"sel":""}" onclick="window.pickCandidate('${id}')">${n} · ${att}/100</button>`;
+  }).join("");
+}
+window.pickCandidate=id=>{selectedCandidate=id; if(roomData){
+  const c=roomData.candidates?.[id]; candidateId=id; candidateData=c;
+  renderCandidateList(roomData.candidates||{},Object.keys(roomData.candidates||{}));
+  renderLiveFeed(c); renderAnswerGrid(c); renderLiveTable(c);
+}};
+// Shows exactly which option the candidate has selected on the question they are on.
+function renderLiveFeed(c){
+  if(!c){$("liveFeed").innerHTML=`<span class="small">Waiting for the candidate to start answering.</span>`;return}
+  const gi=Math.min(99,(Number(c.section)||0)*25+(Number(c.question)||0));
+  const q=QUESTIONS[gi]; if(!q){$("liveFeed").innerHTML=`<span class="small">—</span>`;return}
+  const picked=c.answers?.[q.id];
+  const opts=q.opts.map((o,i)=>{
+    const isPick=picked!==undefined&&Number(picked)===i, isAns=i===q.ans;
+    let tag="";
+    if(isPick) tag=`<span class="pick ${isAns?"correct":"wrong"}">candidate's answer</span>`;
+    else if(isAns) tag=`<span class="pick correct">correct</span>`;
+    return `<div style="margin:3px 0">${String.fromCharCode(65+i)}. ${o} ${tag}</div>`;
+  }).join("");
+  $("liveFeed").innerHTML=`<div class="small">${SECTIONS[c.section||0]} · Question ${(Number(c.question)||0)+1} of 25</div>
+    <div class="qtext">${q.q}</div>${opts}
+    <div style="margin-top:9px">${picked===undefined?`<span class="pick none">Not answered yet</span>`:""}</div>`;
+}
+function renderAnswerGrid(c){
+  let html="";
+  for(let s=0;s<4;s++){
+    const cells=Array.from({length:25},(_,i)=>{
+      const gi=s*25+i, q=QUESTIONS[gi], a=c?.answers?.[q.id];
+      const cur=c&&(Number(c.section)||0)===s&&(Number(c.question)||0)===i;
+      let cls="cell";
+      if(a!==undefined) cls+=Number(a)===q.ans?" correct":" wrong";
+      if(cur) cls+=" cur";
+      return `<div class="${cls}" title="Q${gi+1}">${i+1}</div>`;
+    }).join("");
+    html+=`<div class="seclabel">${SECTIONS[s]}</div><div class="gridwrap"><div class="grid25">${cells}</div></div>`;
+  }
+  $("answerGrid").innerHTML=html;
 }
 function renderLiveTable(c){
   let html="";
