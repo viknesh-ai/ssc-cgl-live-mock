@@ -71,6 +71,11 @@ table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px so
         <input id="roomUrl" readonly placeholder="Candidate link will appear here">
         <button class="secondary" onclick="copyRoom()">Copy Link</button>
       </div>
+      <div class="row" style="margin-top:10px">
+        <input id="joinCode" placeholder="Or watch an existing room — enter its code" style="text-transform:uppercase">
+        <button class="green" onclick="joinRoomByCode()">Watch Room</button>
+      </div>
+      <p class="small" id="roomHint" style="margin-bottom:0">Any number of examiners can watch the same room at once with this login.</p>
     </div>
     <div class="card">
       <div class="monitor">
@@ -187,6 +192,7 @@ let adminMode = new URLSearchParams(location.search).get("admin") === "1";
 let soloMode = new URLSearchParams(location.search).get("solo") === "1";
 let user = null, roomData = null, candidateId = null, candidateData = null, selectedCandidate = null;
 let adminViewQ = null; // null = follow the candidate live; a number pins that question.
+let adminWatchRef = null;
 let section = 0, localQ = 0, answers = {}, reviews = {};
 let timerHandle = null;
 // Sections normally advance on the wall clock. A candidate who submits early
@@ -279,19 +285,45 @@ async function adminLogin(){
   try{
     const c=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
     user=c.user; hide("setup"); show("examiner");
-    // Reattach to a room still in progress so a refresh doesn't strand the examiner.
-    const prior=roomId||localStorage.getItem("sscRoomId");
-    if(prior){
-      const snap=await get(ref(db,"rooms/"+prior));
-      if(snap.exists()&&snap.val()?.status!=="finished"){
-        roomId=prior;
-        $("roomCode").textContent=roomId;
-        $("roomUrl").value=location.origin+location.pathname+"?room="+roomId;
-        watchRoomForAdmin();
-      }else localStorage.removeItem("sscRoomId");
+    // Reattach to a room still in progress: first this browser's own room, then
+    // any active room on the project, so a second examiner on another device
+    // lands on the same exam instead of an empty dashboard.
+    let target=roomId||localStorage.getItem("sscRoomId");
+    if(target){
+      const snap=await get(ref(db,"rooms/"+target));
+      if(!snap.exists()||snap.val()?.status==="finished"){localStorage.removeItem("sscRoomId");target=null}
     }
+    if(!target) target=await findActiveRoom();
+    if(target) await attachRoom(target,true);
+    else $("roomHint").textContent="No active room. Create one, or type a code above to join an exam another examiner started.";
   }catch(e){err("Login failed: "+e.message)}
 }
+// Most recently created room that has not been ended.
+async function findActiveRoom(){
+  try{
+    const snap=await get(ref(db,"rooms"));
+    if(!snap.exists())return null;
+    const active=Object.entries(snap.val()||{})
+      .filter(([,r])=>r&&r.status!=="finished")
+      .sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+    return active.length?active[0][0]:null;
+  }catch(e){return null}
+}
+// Point this dashboard at an existing room. Any number of examiners can attach.
+async function attachRoom(code,quiet){
+  code=String(code||"").trim().toUpperCase();
+  if(!code)return;
+  const snap=await get(ref(db,"rooms/"+code));
+  if(!snap.exists()){ if(!quiet) alert("Room "+code+" not found."); return }
+  roomId=code;
+  localStorage.setItem("sscRoomId",roomId);
+  selectedCandidate=null; adminViewQ=null;
+  $("roomCode").textContent=roomId;
+  $("roomUrl").value=location.origin+location.pathname+"?room="+roomId;
+  $("roomHint").textContent="Watching room "+roomId+". Other examiners can watch it too by entering this code.";
+  watchRoomForAdmin();
+}
+window.joinRoomByCode=()=>attachRoom($("joinCode").value,false);
 async function joinCandidate(){
   const name=$("name").value.trim(); if(!name)return alert("Enter your name.");
   try{
@@ -310,9 +342,10 @@ async function createRoom(){
   roomId=code;
   await set(ref(db,"rooms/"+roomId),{status:"waiting",createdAt:Date.now(),startAt:null,finishedAt:null});
   localStorage.setItem("sscRoomId",roomId);
-  selectedCandidate=null;
+  selectedCandidate=null; adminViewQ=null;
   $("roomCode").textContent=roomId;
   $("roomUrl").value=location.origin+location.pathname+"?room="+roomId;
+  $("roomHint").textContent="Room "+roomId+" created. A second examiner can watch it by entering this code after logging in.";
   $("startBtn").disabled=false; $("finishBtn").disabled=false;
   watchRoomForAdmin();
 }
@@ -328,7 +361,10 @@ async function finishRoom(){
 function copyRoom(){navigator.clipboard?.writeText($("roomUrl").value); alert("Candidate link copied.");}
 
 function watchRoomForAdmin(){
-  onValue(ref(db,"rooms/"+roomId),(snap)=>{
+  // Drop any previous room listener so switching rooms doesn't stack watchers.
+  if(adminWatchRef) off(adminWatchRef);
+  adminWatchRef=ref(db,"rooms/"+roomId);
+  onValue(adminWatchRef,(snap)=>{
     roomData=snap.val()||{};
     $("roomStatus").textContent=roomData.status||"—";
     const cs=roomData.candidates||{}; const ids=Object.keys(cs);
