@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SSC CGL Tier-I Live Mock</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#eef2f7;color:#172033;font-family:Inter,Arial,sans-serif}
+header{background:#172554;color:#fff;padding:13px 20px;position:sticky;top:0;z-index:50}
+.top{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:15px}
+h1{font-size:19px;margin:0}.sub{font-size:12px;color:#cbd5e1;margin-top:3px}
+.timer{font-size:27px;font-weight:800;background:#fff;color:#172554;padding:6px 13px;border-radius:7px;min-width:105px;text-align:center}
+.wrap{max-width:1200px;margin:auto;padding:18px}
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.08);padding:20px;margin-bottom:16px}
+.center{max-width:650px;margin:70px auto}.hidden{display:none!important}
+button{border:0;border-radius:7px;padding:10px 15px;font-weight:700;cursor:pointer}
+.primary{background:#172554;color:#fff}.secondary{background:#64748b;color:#fff}.danger{background:#b91c1c;color:#fff}.green{background:#166534;color:#fff}
+input{padding:11px;border:1px solid #cbd5e1;border-radius:7px;width:100%;font-size:15px}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1}
+.notice{background:#fff7ed;border-left:4px solid #f97316;padding:12px;border-radius:6px;margin-bottom:15px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 285px;gap:16px}
+.qmeta{display:flex;justify-content:space-between;gap:10px;color:#64748b;font-size:13px;margin-bottom:12px}
+.progress{height:7px;background:#e2e8f0;border-radius:8px;overflow:hidden}.bar{height:100%;background:#172554}
+.q{font-size:18px;font-weight:650;line-height:1.58;margin:0 0 18px}
+.opt{display:block;border:1px solid #d5dbe5;border-radius:8px;padding:12px;margin:9px 0;cursor:pointer;line-height:1.45}
+.opt:hover{background:#f8fafc}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.palette{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.p{padding:7px 3px;background:#fff;border:1px solid #cbd5e1}.p.ans{background:#dcfce7}.p.rev{outline:3px solid #fde68a}
+.badge{display:inline-block;background:#e0e7ff;color:#1e3a8a;border-radius:99px;padding:5px 9px;font-size:12px;font-weight:800}
+.small{font-size:13px;color:#64748b;line-height:1.5}
+.monitor{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#f8fafc;border-radius:8px;padding:12px}.stat b{display:block;font-size:20px;margin-top:3px}
+.live{color:#166534;font-weight:800}.waiting{color:#92400e;font-weight:800}
+table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.monitor{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="top">
+  <div><h1>SSC CGL Tier-I Live Mock</h1><div class="sub">100 Questions · 4 × 15 minutes · Live Examiner Monitor</div></div>
+  <div id="timer" class="timer">--:--</div>
+</div></header>
+
+<div class="wrap">
+  <div id="setup" class="card center">
+    <h2 id="setupTitle">Loading…</h2>
+    <div id="setupBody"></div>
+  </div>
+
+  <div id="examiner" class="hidden">
+    <div class="card">
+      <h2>Examiner Dashboard</h2>
+      <div class="row">
+        <button class="primary" onclick="createRoom()">Create New Room</button>
+        <input id="roomUrl" readonly placeholder="Candidate link will appear here">
+        <button class="secondary" onclick="copyRoom()">Copy Link</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="monitor">
+        <div class="stat">Room<b id="roomCode">—</b></div>
+        <div class="stat">Status<b id="roomStatus">Waiting</b></div>
+        <div class="stat">Candidate<b id="candidateName">—</b></div>
+        <div class="stat">Section<b id="candidateSection">—</b></div>
+      </div>
+      <div style="margin-top:12px" class="monitor">
+        <div class="stat">Question<b id="candidateQuestion">—</b></div>
+        <div class="stat">Attempted<b id="candidateAttempted">—</b></div>
+        <div class="stat">Marked<b id="candidateMarked">—</b></div>
+        <div class="stat">Candidate timer<b id="candidateTimer">—</b></div>
+      </div>
+      <div class="actions" style="margin-top:15px">
+        <button class="green" id="startBtn" onclick="startRoom()" disabled>Start Exam</button>
+        <button class="danger" id="finishBtn" onclick="finishRoom()" disabled>End Exam</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Live Section Progress</h3>
+      <table><thead><tr><th>Section</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Score</th><th>Accuracy</th></tr></thead>
+      <tbody id="liveTable"></tbody></table>
+      <p class="small">Scores shown live are based on answers currently saved by the candidate.</p>
+    </div>
+  </div>
+
+  <div id="candidate" class="hidden">
+    <div id="candidateWaiting" class="card center">
+      <h2>Waiting for examiner</h2>
+      <p>Your name: <b id="myName"></b></p>
+      <p class="small">Keep this tab open. The examiner will start the mock.</p>
+    </div>
+    <div id="candidateExam" class="hidden">
+      <div class="notice"><b id="sectionTitle"></b> · Fixed 15-minute timer. When it reaches zero, this section locks and the next section opens automatically.</div>
+      <div class="layout">
+        <main class="card">
+          <div class="qmeta"><span id="qCounter"></span><span id="qSection" class="badge"></span></div>
+          <div class="progress"><div id="qbar" class="bar"></div></div>
+          <p id="question" class="q"></p>
+          <div id="options"></div>
+          <div class="actions">
+            <button class="secondary" onclick="prevQ()">Previous</button>
+            <button class="secondary" onclick="markReview()">Mark for Review</button>
+            <button class="primary" onclick="nextQ()">Save & Next</button>
+          </div>
+        </main>
+        <aside class="card">
+          <b>Question Palette</b>
+          <div id="palette" class="palette" style="margin-top:12px"></div>
+          <p class="small">Green = answered · yellow outline = review.</p>
+        </aside>
+      </div>
+    </div>
+    <div id="candidateResult" class="card hidden"></div>
+  </div>
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="questions.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getDatabase, ref, get, set, update, onValue, off } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+const cfg = window.FIREBASE_CONFIG || {};
+const configured = cfg.apiKey && !String(cfg.apiKey).startsWith("PASTE_");
+const app = configured ? initializeApp(cfg) : null;
+const auth = app ? getAuth(app) : null;
+const db = app ? getDatabase(app) : null;
+
+const SECTIONS = [
+ "General Intelligence & Reasoning",
+ "General Awareness",
+ "Quantitative Aptitude",
+ "English Language & Comprehension"
+];
+
+let roomId = new URLSearchParams(location.search).get("room");
+let adminMode = new URLSearchParams(location.search).get("admin") === "1";
+let user = null, roomData = null, candidateId = null, candidateData = null;
+let section = 0, localQ = 0, answers = {}, reviews = {};
+let timerHandle = null;
+
+const $ = id => document.getElementById(id);
+function show(id){$(id).classList.remove("hidden")} function hide(id){$(id).classList.add("hidden")}
+function err(msg){$("setupBody").innerHTML=`<div class="notice">${msg}</div>`}
+function sectionStart(){return section*25}
+function currentQ(){return QUESTIONS[sectionStart()+localQ]}
+
+async function boot(){
+  if(!configured){$("setupTitle").textContent="Firebase setup required"; err("Open <b>README.md</b> and put your Firebase Web App config into <b>firebase-config.js</b>."); return;}
+  if(adminMode){
+    $("setupTitle").textContent="Examiner Login";
+    $("setupBody").innerHTML=`<div class="row"><input id="email" placeholder="Examiner email"><input id="password" type="password" placeholder="Password"></div><div class="actions"><button class="primary" id="loginBtn">Login</button></div><p class="small">Use the same email you placed in database.rules.json.</p>`;
+    $("loginBtn").onclick=adminLogin;
+  } else if(roomId){
+    $("setupTitle").textContent="Join SSC CGL Mock";
+    $("setupBody").innerHTML=`<input id="name" placeholder="Enter your name"><div class="actions"><button class="primary" id="joinBtn">Join Exam</button></div><p class="small">Room: <b>${roomId}</b></p>`;
+    $("joinBtn").onclick=joinCandidate;
+  } else {
+    $("setupTitle").textContent="SSC CGL Tier-I Live Mock";
+    $("setupBody").innerHTML=`<p>Use <b>?admin=1</b> to open the examiner dashboard.</p><p>Or open a candidate room link sent by the examiner.</p>`;
+  }
+}
+async function adminLogin(){
+  try{
+    const c=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
+    user=c.user; hide("setup"); show("examiner");
+  }catch(e){err("Login failed: "+e.message)}
+}
+async function joinCandidate(){
+  const name=$("name").value.trim(); if(!name)return alert("Enter your name.");
+  try{
+    const c=await signInAnonymously(auth); user=c.user; candidateId=user.uid;
+    const roomSnap=await get(ref(db,"rooms/"+roomId));
+    if(!roomSnap.exists())return err("Room not found.");
+    candidateData={name,status:"waiting",section:0,question:0,answers:{},reviews:{},joinedAt:Date.now()};
+    await set(ref(db,`rooms/${roomId}/candidates/${candidateId}`),candidateData);
+    hide("setup"); show("candidate"); $("myName").textContent=name;
+    watchRoomForCandidate();
+  }catch(e){err("Could not join: "+e.message)}
+}
+async function createRoom(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let code="";
+  for(let i=0;i<6;i++)code+=chars[Math.floor(Math.random()*chars.length)];
+  roomId=code;
+  await set(ref(db,"rooms/"+roomId),{status:"waiting",createdAt:Date.now(),startAt:null,finishedAt:null});
+  $("roomCode").textContent=roomId;
+  $("roomUrl").value=location.origin+location.pathname+"?room="+roomId;
+  $("startBtn").disabled=false; $("finishBtn").disabled=false;
+  watchRoomForAdmin();
+}
+async function startRoom(){
+  if(!roomId)return;
+  const startAt=Date.now();
+  await update(ref(db,"rooms/"+roomId),{status:"running",startAt});
+}
+async function finishRoom(){
+  if(!roomId)return;
+  if(confirm("End this exam now?")) await update(ref(db,"rooms/"+roomId),{status:"finished",finishedAt:Date.now()});
+}
+function copyRoom(){navigator.clipboard?.writeText($("roomUrl").value); alert("Candidate link copied.");}
+
+function watchRoomForAdmin(){
+  onValue(ref(db,"rooms/"+roomId),(snap)=>{
+    roomData=snap.val()||{};
+    $("roomStatus").textContent=roomData.status||"—";
+    const cs=roomData.candidates||{}; const ids=Object.keys(cs);
+    if(ids.length){candidateId=ids[0]; candidateData=cs[candidateId];}
+    else candidateData=null;
+    $("candidateName").textContent=candidateData?.name||"—";
+    $("candidateSection").textContent=candidateData ? SECTIONS[candidateData.section] : "—";
+    $("candidateQuestion").textContent=candidateData ? `${(candidateData.question||0)+1}/25` : "—";
+    const vals=Object.values(candidateData?.answers||{}); $("candidateAttempted").textContent=vals.length;
+    $("candidateMarked").textContent=Object.values(candidateData?.reviews||{}).filter(Boolean).length;
+    if(roomData.startAt && roomData.status==="running"){
+      const elapsed=Math.max(0,Date.now()-roomData.startAt);
+      const s=Math.min(3,Math.floor(elapsed/900000));
+      $("candidateTimer").textContent=fmt(900-Math.floor((elapsed%900000)/1000));
+    }else $("candidateTimer").textContent="—";
+    renderLiveTable(candidateData);
+    $("startBtn").disabled=roomData.status!=="waiting";
+    $("finishBtn").disabled=roomData.status!=="running";
+  });
+}
+function renderLiveTable(c){
+  let html="";
+  for(let s=0;s<4;s++){
+    let correct=0,wrong=0,skip=25;
+    for(let i=s*25;i<s*25+25;i++){
+      const q=QUESTIONS[i], a=c?.answers?.[q.id];
+      if(a!==undefined){skip--; if(Number(a)===q.ans)correct++; else wrong++}
+    }
+    const score=correct*2-wrong*.5, attempted=correct+wrong, acc=attempted?correct/attempted*100:0;
+    html+=`<tr><td>${SECTIONS[s]}</td><td>${correct}</td><td>${wrong}</td><td>${skip}</td><td>${score.toFixed(1)}</td><td>${acc.toFixed(1)}%</td></tr>`;
+  }
+  $("liveTable").innerHTML=html;
+}
+function watchRoomForCandidate(){
+  onValue(ref(db,"rooms/"+roomId),(snap)=>{
+    roomData=snap.val()||{};
+    const c=roomData.candidates?.[candidateId];
+    if(c) candidateData=c;
+    if(roomData.status==="waiting"){hide("candidateExam");show("candidateWaiting");$("timer").textContent="WAIT";}
+    else if(roomData.status==="running"){
+      hide("candidateWaiting"); show("candidateExam");
+      syncPositionFromServer();
+      runTimerFromStart();
+    }else if(roomData.status==="finished"){
+      clearInterval(timerHandle); hide("candidateExam");hide("candidateWaiting");show("candidateResult");showResult();
+      $("timer").textContent="DONE";
+    }
+  });
+}
+function syncPositionFromServer(){
+  if(!roomData.startAt)return;
+  const elapsed=Math.max(0,Date.now()-roomData.startAt);
+  const s=Math.min(3,Math.floor(elapsed/900000));
+  section=s;
+  if(candidateData?.section!==section){
+    candidateData.section=section;
+    localQ=0;
+    update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),{section,question:0});
+  }else localQ=Math.min(24,Number(candidateData.question||0));
+  answers=candidateData.answers||{}; reviews=candidateData.reviews||{};
+  renderCandidate();
+}
+function runTimerFromStart(){
+  clearInterval(timerHandle);
+  timerHandle=setInterval(()=>{
+    if(!roomData?.startAt)return;
+    const elapsed=Math.max(0,Date.now()-roomData.startAt);
+    const s=Math.min(3,Math.floor(elapsed/900000));
+    const secLeft=900-Math.floor((elapsed%900000)/1000);
+    $("timer").textContent=fmt(secLeft);
+    if(s!==section){section=s;localQ=0;syncPositionFromServer();}
+    if(elapsed>=3600000){clearInterval(timerHandle); showResult();}
+  },250);
+}
+function fmt(x){x=Math.max(0,x);return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0")}
+function persist(){
+  const data={section,question:localQ,answers,reviews,status:"running",name:candidateData.name,lastSeen:Date.now()};
+  update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),data);
+}
+function renderCandidate(){
+  const q=currentQ(); $("sectionTitle").textContent=SECTIONS[section];
+  $("qCounter").textContent=`Question ${localQ+1} of 25`; $("qSection").textContent=SECTIONS[section];
+  $("qbar").style.width=((localQ+1)/25*100)+"%"; $("question").textContent=q.q;
+  $("options").innerHTML=q.opts.map((o,i)=>`<label class="opt"><input type="radio" name="a" value="${i}" ${answers[q.id]===i?"checked":""}> ${String.fromCharCode(65+i)}. ${o}</label>`).join("");
+  $("options").querySelectorAll("input").forEach(el=>el.onchange=()=>{answers[q.id]=Number(el.value);persist();renderPalette()});
+  renderPalette();
+}
+function renderPalette(){
+  $("palette").innerHTML=Array.from({length:25},(_,i)=>{
+    const q=QUESTIONS[sectionStart()+i];
+    return `<button class="p ${answers[q.id]!==undefined?"ans":""} ${reviews[q.id]?"rev":""}" onclick="window.jumpQ(${i})">${i+1}</button>`
+  }).join("");
+}
+window.jumpQ=i=>{localQ=i;persist();renderCandidate()}
+window.prevQ=()=>{if(localQ>0){localQ--;persist();renderCandidate()}}
+window.nextQ=()=>{if(localQ<24){localQ++;persist();renderCandidate()}else alert("You are at the end of this section. You can review until the 15-minute timer ends.")}
+window.markReview=()=>{const id=currentQ().id;reviews[id]=!reviews[id];if(localQ<24)localQ++;persist();renderCandidate()}
+function showResult(){
+  let total=0, html="";
+  for(let s=0;s<4;s++){
+    let c=0,w=0,u=0;
+    for(let i=s*25;i<s*25+25;i++){const q=QUESTIONS[i],a=answers[q.id];if(a===undefined)u++;else if(Number(a)===q.ans)c++;else w++}
+    const score=c*2-w*.5,at=c+w,acc=at?c/at*100:0;total+=score;
+    html+=`<tr><td>${SECTIONS[s]}</td><td>${c}</td><td>${w}</td><td>${u}</td><td>${score.toFixed(1)}</td><td>${acc.toFixed(1)}%</td></tr>`;
+  }
+  const attempted=Object.keys(answers).length;
+  const correct=Object.keys(answers).filter(id=>{const q=QUESTIONS.find(x=>x.id==id);return Number(answers[id])===q.ans}).length;
+  $("candidateResult").innerHTML=`<h2>Mock Completed</h2><h1>${total.toFixed(1)} / 200</h1><p>Attempted: ${attempted} · Accuracy: ${attempted?(correct/attempted*100).toFixed(1):"0"}%</p><table><tr><th>Section</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Score</th><th>Accuracy</th></tr>${html}</table>`;
+}
+onAuthStateChanged(auth,u=>{user=u});
+window.createRoom=createRoom;window.startRoom=startRoom;window.finishRoom=finishRoom;window.copyRoom=copyRoom;
+boot();
+</script>
+</body>
+</html>
