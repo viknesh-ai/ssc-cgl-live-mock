@@ -129,6 +129,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px so
             <button class="secondary" onclick="prevQ()">Previous</button>
             <button class="secondary" onclick="markReview()">Mark for Review</button>
             <button class="primary" onclick="nextQ()">Save & Next</button>
+            <button class="danger hidden" id="soloEnd" onclick="endSolo()">Submit Test</button>
           </div>
         </main>
         <aside class="card">
@@ -171,6 +172,9 @@ if(Array.isArray(window.QUESTIONS)){
 
 let roomId = new URLSearchParams(location.search).get("room");
 let adminMode = new URLSearchParams(location.search).get("admin") === "1";
+// Solo practice: full 100-question mock, run entirely in the browser. No room,
+// no examiner, no Firebase — so it works even before Auth is switched on.
+let soloMode = new URLSearchParams(location.search).get("solo") === "1";
 let user = null, roomData = null, candidateId = null, candidateData = null, selectedCandidate = null;
 let section = 0, localQ = 0, answers = {}, reviews = {};
 let timerHandle = null;
@@ -182,6 +186,15 @@ function sectionStart(){return section*25}
 function currentQ(){return QUESTIONS[sectionStart()+localQ]}
 
 async function boot(){
+  if(soloMode){
+    $("setupTitle").textContent="Practice Mock — Solo";
+    $("setupBody").innerHTML=`<p class="small">100 questions · 4 sections × 15 minutes · +2 correct, −0.50 wrong.<br>
+      Each section locks when its 15 minutes are up and the next one opens automatically.<br>
+      Nothing is saved to a server — your score is shown at the end.</p>
+      <div class="actions"><button class="primary" id="startSolo">Start Practice Test</button></div>`;
+    $("startSolo").onclick=startSolo;
+    return;
+  }
   if(!configured){$("setupTitle").textContent="Firebase setup required"; err("Open <b>README.md</b> and put your Firebase Web App config into <b>firebase-config.js</b>."); return;}
   if(adminMode){
     $("setupTitle").textContent="Examiner Login";
@@ -193,10 +206,30 @@ async function boot(){
     $("joinBtn").onclick=joinCandidate;
   } else {
     $("setupTitle").textContent="SSC CGL Tier-I Live Mock";
-    $("setupBody").innerHTML=`<p class="small">Candidates: open the room link the examiner sent you.</p><div class="actions"><button class="primary" id="toAdmin">Examiner Login</button></div>`;
+    $("setupBody").innerHTML=`<p class="small">Take the full 100-question mock on your own, or open the room link the examiner sent you.</p>
+      <div class="actions"><button class="primary" id="toSolo">Take the Mock Now</button><button class="secondary" id="toAdmin">Examiner Login</button></div>`;
+    $("toSolo").onclick=()=>{location.search="?solo=1"};
     $("toAdmin").onclick=()=>{location.search="?admin=1"};
   }
 }
+function startSolo(){
+  roomData={status:"running",startAt:Date.now()};
+  candidateData={name:"Practice",section:0,question:0,answers:{},reviews:{}};
+  // Share the same objects so the section rollover below can't clobber answers.
+  section=0; localQ=0; answers=candidateData.answers; reviews=candidateData.reviews;
+  hide("setup"); show("candidate"); hide("candidateWaiting"); show("candidateExam");
+  $("soloEnd").classList.remove("hidden");
+  renderCandidate();
+  runTimerFromStart();
+}
+function endSolo(){
+  clearInterval(timerHandle);
+  hide("candidateExam"); hide("candidateWaiting"); show("candidateResult");
+  $("timer").textContent="DONE";
+  showResult();
+  window.scrollTo(0,0);
+}
+window.endSolo=()=>{if(confirm("Submit and see your score?")) endSolo()};
 async function adminLogin(){
   try{
     const c=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
@@ -358,7 +391,7 @@ function syncPositionFromServer(){
   if(candidateData?.section!==section){
     candidateData.section=section;
     localQ=0;
-    update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),{section,question:0});
+    if(!soloMode) update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),{section,question:0});
   }else localQ=Math.min(24,Number(candidateData.question||0));
   answers=candidateData.answers||{}; reviews=candidateData.reviews||{};
   renderCandidate();
@@ -372,11 +405,12 @@ function runTimerFromStart(){
     const secLeft=900-Math.floor((elapsed%900000)/1000);
     $("timer").textContent=fmt(secLeft);
     if(s!==section){section=s;localQ=0;syncPositionFromServer();}
-    if(elapsed>=3600000){clearInterval(timerHandle); showResult();}
+    if(elapsed>=3600000){clearInterval(timerHandle); if(soloMode)endSolo(); else showResult();}
   },250);
 }
 function fmt(x){x=Math.max(0,x);return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0")}
 function persist(){
+  if(soloMode) return; // Solo runs entirely client-side; nothing to sync.
   const data={section,question:localQ,answers,reviews,status:"running",name:candidateData.name,lastSeen:Date.now()};
   update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),data);
 }
@@ -410,7 +444,7 @@ function showResult(){
   const correct=Object.keys(answers).filter(id=>{const q=QUESTIONS.find(x=>x.id==id);return Number(answers[id])===q.ans}).length;
   $("candidateResult").innerHTML=`<h2>Mock Completed</h2><h1>${total.toFixed(1)} / 200</h1><p>Attempted: ${attempted} · Accuracy: ${attempted?(correct/attempted*100).toFixed(1):"0"}%</p><table><tr><th>Section</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Score</th><th>Accuracy</th></tr>${html}</table>`;
 }
-onAuthStateChanged(auth,u=>{user=u});
+if(auth) onAuthStateChanged(auth,u=>{user=u});
 window.createRoom=createRoom;window.startRoom=startRoom;window.finishRoom=finishRoom;window.copyRoom=copyRoom;
 boot();
 </script>
