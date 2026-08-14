@@ -1,1 +1,416 @@
-window.QUESTIONS = [{"id":1,"sec":"English Language & Comprehension","q":"Select the antonym of 'Obscure'.","opts":["Hidden","Vague","Prominent","Doubtful"],"ans":2},{"id":2,"sec":"English Language & Comprehension","q":"One-word substitution: 'A person who deliberately sets fire to property' is called:","opts":["Arsonist","Extortionist","Vandal","Saboteur"],"ans":0},{"id":3,"sec":"General Awareness","q":"Which blood component is primarily responsible for clotting?","opts":["Red blood cells","White blood cells","Platelets","Plasma proteins only"],"ans":2},{"id":4,"sec":"General Awareness","q":"The 73rd Constitutional Amendment is primarily associated with which of the following?","opts":["Urban local bodies","Panchayati Raj institutions","Fundamental Duties","Inter-State Council"],"ans":1},{"id":5,"sec":"English Language & Comprehension","q":"Identify the part of the sentence that contains an error: 'Having completed the assignment, the television was switched on by Rohan.'","opts":["Having completed the assignment","the television was switched on","by Rohan","No error"],"ans":1},{"id":6,"sec":"Quantitative Aptitude","q":"A and B invest in a business in the ratio 4:5. After 6 months A withdraws half of his capital, while B keeps his capital unchanged for the whole year. If the total profit is ₹28,000, what is A's share?","opts":["₹10,000","₹11,200","₹12,000","₹14,000"],"ans":1},{"id":7,"sec":"General Awareness","q":"Which Schedule of the Indian Constitution contains provisions relating to the allocation of seats in the Rajya Sabha to the States and Union Territories?","opts":["Third Schedule","Fourth Schedule","Fifth Schedule","Seventh Schedule"],"ans":1},{"id":8,"sec":"General Awareness","q":"Which Article of the Constitution of India deals specifically with equality before law and equal protection of laws within the territory of India?","opts":["Article 12","Article 14","Article 16","Article 21"],"ans":1},{"id":9,"sec":"General Awareness","q":"The 'Drain of Wealth' theory was most prominently associated with:","opts":["Dadabhai Naoroji","Bal Gangadhar Tilak","Gopal Krishna Gokhale","Lala Lajpat Rai"],"ans":0},{"id":10,"sec":"General Awareness","q":"Who among the following founded the Brahmo Samaj in 1828?","opts":["Swami Dayanand Saraswati","Raja Ram Mohan Roy","Ishwar Chandra Vidyasagar","Swami Vivekananda"],"ans":1},{"id":11,"sec":"General Intelligence & Reasoning","q":"If the letters of the word 'CONSTITUTION' are arranged alphabetically, which letter will be fifth from the left?","opts":["I","N","O","S"],"ans":2},{"id":12,"sec":"Quantitative Aptitude","q":"A trader sells two articles at the same selling price. On one he gains 20% and on the other he loses 20%. What is the overall percentage loss?","opts":["2%","4%","5%","8%"],"ans":1},{"id":13,"sec":"General Intelligence & Reasoning","q":"A, B, C, D and E have different heights. A is taller than B but shorter than D. C is shorter than B but taller than E. Who is the second tallest?","opts":["A","B","C","D"],"ans":0},{"id":14,"sec":"General Awareness","q":"Repo rate refers to the rate at which:","opts":["Commercial banks lend to customers","RBI lends short-term funds to commercial banks","RBI borrows from commercial banks","Government lends to RBI"],"ans":1},{"id":15,"sec":"General Intelligence & Reasoning","q":"Find the number that does not belong: 17, 26, 37, 50, 65, 82, 101","opts":["26","37","50","101"],"ans":3},{"id":16,"sec":"General Intelligence & Reasoning","q":"A paper is folded twice and a single hole is punched through all layers. When unfolded, how many holes will appear, assuming no edge overlap?","opts":["2","4","6","8"],"ans":1},{"id":17,"sec":"Quantitative Aptitude","q":"A, B and C can complete a work individually in 12, 18 and 24 days respectively. They work together for 3 days, after which A leaves. B and C finish the remaining work. How many more days are required?","opts":["4 days","5 days","6 days","7 days"],"ans":1},{"id":18,"sec":"English Language & Comprehension","q":"Choose the correct sentence.","opts":["The number of applicants have increased considerably.","The number of applicants has increased considerably.","A number of applicant has increased considerably.","The numbers of applicants has increased considerably."],"ans":1},{"id":19,"sec":"English Language & Comprehension","q":"Choose the correct form: 'The data collected from the survey ___ that consumer preferences are changing.'","opts":["indicate","indicates","has indicate","was indicating"],"ans":0},{"id":20,"sec":"General Awareness","q":"The headquarters of the World Health Organization is in:","opts":["Vienna","Geneva","Rome","The Hague"],"ans":1},{"id":21,"sec":"Quantitative Aptitude","q":"The price of sugar increases by 25%. By what percentage must a family reduce its consumption so that expenditure on sugar remains unchanged?","opts":["16%","20%","25%","30%"],"ans":1},{"id":22,"sec":"Quantitative Aptitude","q":"A boat travels 30 km downstream in 2 hours and the same distance upstream in 3 hours. What is the speed of the boat in still water and the speed of the stream respectively?","opts":["12.5 km/h, 2.5 km/h","13 km/h, 2 km/h","15 km/h, 2.5 km/h","15 km/h, 5 km/h"],"ans":0},{"id":23,"sec":"English Language & Comprehension","q":"Choose the best replacement for the underlined phrase: 'The officer insisted to submit the documents immediately.'","opts":["insisted on submitting","insisted for submitting","insisted to submitting","No improvement"],"ans":0},{"id":24,"sec":"Quantitative Aptitude","q":"A rectangular field has its length increased by 20% and its breadth decreased by 10%. If its original area was 2,500 m², what is the new area?","opts":["2,600 m²","2,650 m²","2,700 m²","2,750 m²"],"ans":2},{"id":25,"sec":"English Language & Comprehension","q":"Choose the most appropriate idiom: 'The manager tried to avoid giving a direct answer, but the reporter finally ___.'","opts":["broke the ice","hit the nail on the head","beat around the bush","called it a day"],"ans":1},{"id":26,"sec":"General Awareness","q":"Which vitamin is synthesised in the human body when skin is exposed to sunlight?","opts":["Vitamin A","Vitamin C","Vitamin D","Vitamin K"],"ans":2},{"id":27,"sec":"General Awareness","q":"The Reserve Bank of India was established in 1935 on the recommendation of which commission?","opts":["Hunter Commission","Hilton Young Commission","Simon Commission","Sarkaria Commission"],"ans":1},{"id":28,"sec":"General Intelligence & Reasoning","q":"Find the missing number in the series: 7, 15, 31, 63, 127, ?","opts":["191","223","255","257"],"ans":2},{"id":29,"sec":"General Intelligence & Reasoning","q":"A cube is painted on all six faces and then cut into 125 smaller equal cubes. How many smaller cubes have exactly two faces painted?","opts":["24","36","48","54"],"ans":2},{"id":30,"sec":"General Intelligence & Reasoning","q":"If 1 January 2025 was a Wednesday, what day of the week was 1 March 2025?","opts":["Friday","Saturday","Sunday","Monday"],"ans":1},{"id":31,"sec":"General Awareness","q":"The pH of a neutral solution at 25°C is approximately:","opts":["0","5","7","14"],"ans":2},{"id":32,"sec":"General Intelligence & Reasoning","q":"Six persons A, B, C, D, E and F sit around a circular table facing the centre. A sits second to the left of B. C sits immediate right of A. D is not a neighbour of B. Who sits immediate left of E?","opts":["A","C","D","F"],"ans":3},{"id":33,"sec":"English Language & Comprehension","q":"Identify the error: 'Each of the proposals submitted by the departments have been carefully examined.'","opts":["Each of the proposals","submitted by the departments","have been carefully examined","No error"],"ans":2},{"id":34,"sec":"English Language & Comprehension","q":"Select the most appropriate word to fill in the blank: 'The committee's decision was ___ by several members because it had not considered the financial implications.'","opts":["praised","endorsed","questioned","implemented"],"ans":2},{"id":35,"sec":"English Language & Comprehension","q":"Fill in the blank: 'No sooner ___ the meeting begun than the electricity failed.'","opts":["did","had","has","was"],"ans":1},{"id":36,"sec":"General Intelligence & Reasoning","q":"A statement is followed by two assumptions. Statement: 'The company has advised employees to use public transport because parking space is limited.' Assumptions: I. Employees generally need parking space. II. Public transport can reduce the demand for parking space. Which is/are implicit?","opts":["Only I","Only II","Both I and II","Neither I nor II"],"ans":2},{"id":37,"sec":"General Intelligence & Reasoning","q":"A clock gains 5 minutes every hour. If it is set correctly at 8:00 AM, what time will it show at 8:00 PM the same day?","opts":["8:45 PM","9:00 PM","9:15 PM","9:30 PM"],"ans":1},{"id":38,"sec":"Quantitative Aptitude","q":"The diagonals of a rhombus are 24 cm and 10 cm. What is its perimeter?","opts":["52 cm","56 cm","60 cm","64 cm"],"ans":2},{"id":39,"sec":"General Awareness","q":"Which of the following diseases is caused by a protozoan parasite?","opts":["Malaria","Tuberculosis","Typhoid","Ringworm"],"ans":0},{"id":40,"sec":"General Intelligence & Reasoning","q":"If 'P × Q' means P is the father of Q, 'P + Q' means P is the sister of Q, and 'P - Q' means P is the mother of Q, which expression represents A as the maternal uncle of B?","opts":["A + C - B","A × C + B","A + C × B","A - C + B"],"ans":2},{"id":41,"sec":"General Intelligence & Reasoning","q":"Which Venn diagram best represents the relationship among Engineers, Graduates and Women?","opts":["All three completely separate","Engineers and Graduates overlap; Women overlaps both","Engineers completely inside Women and Graduates separate","All three must be identical"],"ans":1},{"id":42,"sec":"General Intelligence & Reasoning","q":"If in a certain relation, 6 is related to 42, 8 is related to 72, and 11 is related to 132, then 13 is related to:","opts":["156","169","182","195"],"ans":2},{"id":43,"sec":"General Awareness","q":"The term 'GDP deflator' is primarily used to measure:","opts":["Unemployment","Changes in the general price level of domestically produced goods and services","Fiscal deficit","Population growth"],"ans":1},{"id":44,"sec":"Quantitative Aptitude","q":"A sum of money is divided among A, B and C in the ratio 5:7:8. If C receives ₹2,400 more than A, what is the total amount distributed among the three?","opts":["₹18,000","₹20,000","₹24,000","₹30,000"],"ans":2},{"id":45,"sec":"Quantitative Aptitude","q":"A person spends 30% of his income on rent, 20% on food and 15% on education. He saves ₹14,000, which is 35% of the remaining amount after these expenses. What is his monthly income?","opts":["₹40,000","₹45,000","₹50,000","₹56,000"],"ans":2},{"id":46,"sec":"English Language & Comprehension","q":"Choose the correct meaning of 'to take something with a pinch of salt'.","opts":["To accept something completely","To treat something with some scepticism","To reject something angrily","To remember something carefully"],"ans":1},{"id":47,"sec":"Quantitative Aptitude","q":"If 3x - 2y = 7 and 2x + 3y = 4, then x + y equals:","opts":["1","2","3","4"],"ans":0},{"id":48,"sec":"Quantitative Aptitude","q":"A circular track has circumference 440 m. A runner completes 5 rounds in 8 minutes. What is his speed in km/h?","opts":["15 km/h","16.5 km/h","16.8 km/h","18 km/h"],"ans":2},{"id":49,"sec":"General Intelligence & Reasoning","q":"In a row of students, P is 17th from the left and Q is 23rd from the right. If P is exactly 8 places to the left of Q, how many students are there in the row?","opts":["41","47","49","55"],"ans":1},{"id":50,"sec":"General Awareness","q":"The Tropic of Cancer passes through which of the following states?","opts":["Kerala","Tamil Nadu","Mizoram","Andhra Pradesh"],"ans":2},{"id":51,"sec":"English Language & Comprehension","q":"Choose the sentence that is grammatically correct.","opts":["Neither the manager nor his assistants was aware of the changes.","Neither the manager nor his assistants were aware of the changes.","Neither the manager nor his assistants has aware of the changes.","Neither the manager or his assistants were aware of the changes."],"ans":1},{"id":52,"sec":"Quantitative Aptitude","q":"A shopkeeper marks an article 40% above its cost price and then allows two successive discounts of 10% and 5%. If the article is sold for ₹2,394, what was its cost price?","opts":["₹2,000","₹2,100","₹2,200","₹2,400"],"ans":1},{"id":53,"sec":"English Language & Comprehension","q":"Select the synonym of 'Inadvertent' as used in the sentence: 'The damage was inadvertent and resulted from a simple oversight.'","opts":["Deliberate","Accidental","Repeated","Suspicious"],"ans":1},{"id":54,"sec":"English Language & Comprehension","q":"Select the synonym of 'Austere'.","opts":["Luxurious","Severe and simple","Colourful","Flexible"],"ans":1},{"id":55,"sec":"General Intelligence & Reasoning","q":"Find the missing term: AZ, CX, EV, GT, ?","opts":["IR","IS","JR","JQ"],"ans":0},{"id":56,"sec":"English Language & Comprehension","q":"Choose the correct indirect speech: Rahul said, 'I have been waiting for you since morning.'","opts":["Rahul said that I had been waiting for him since morning.","Rahul said that he had been waiting for me since morning.","Rahul said that he has been waiting for me since morning.","Rahul said he was waiting for you since morning."],"ans":1},{"id":57,"sec":"General Awareness","q":"The 'Blue Revolution' in India is associated mainly with:","opts":["Milk production","Fish production","Oilseed production","Wheat production"],"ans":1},{"id":58,"sec":"General Awareness","q":"The Permanent Settlement introduced by Lord Cornwallis in 1793 was primarily implemented in:","opts":["Bengal, Bihar and parts of Odisha","Punjab and Sindh","Madras Presidency only","Bombay Presidency only"],"ans":0},{"id":59,"sec":"Quantitative Aptitude","q":"A can complete a work in 18 days and B can complete the same work in 24 days. They work together for 6 days, after which C completes the remaining work in 4 days. In how many days can C alone complete the whole work?","opts":["8 days","9 days","10 days","12 days"],"ans":2},{"id":60,"sec":"Quantitative Aptitude","q":"A pipe can fill a tank in 12 hours and another pipe can empty it in 18 hours. If both are opened together for 4 hours and then the outlet is closed, how much more time will the inlet alone take to fill the tank?","opts":["5 hours 20 min","6 hours","7 hours 20 min","8 hours"],"ans":2},{"id":61,"sec":"General Awareness","q":"Which of the following is a greenhouse gas with a major role in the natural greenhouse effect?","opts":["Nitrogen","Oxygen","Carbon dioxide","Argon"],"ans":2},{"id":62,"sec":"English Language & Comprehension","q":"Select the word closest in meaning to 'Pragmatic'.","opts":["Idealistic","Practical","Emotional","Rigid"],"ans":1},{"id":63,"sec":"English Language & Comprehension","q":"Choose the correctly arranged sentence: P: because of heavy rainfall Q: the match was postponed R: in the evening S: by the organisers.","opts":["QSPR","QSRP","PQRS","SQPR"],"ans":0},{"id":64,"sec":"General Awareness","q":"Which of the following is generally considered a direct tax in India?","opts":["GST","Customs duty","Income tax","Excise duty"],"ans":2},{"id":65,"sec":"General Intelligence & Reasoning","q":"If all the vowels in the word 'EDUCATION' are replaced by the next vowel in the sequence A-E-I-O-U-A, what will the resulting word be?","opts":["IDACATUAN","ADICOTIUN","IDICOTIUN","EDUCATION"],"ans":0},{"id":66,"sec":"Quantitative Aptitude","q":"If x + 1/x = 5, where x is positive, then the value of x² + 1/x² is:","opts":["21","23","25","27"],"ans":1},{"id":67,"sec":"General Awareness","q":"Which river is known as the 'Dakshin Ganga'?","opts":["Krishna","Godavari","Narmada","Kaveri"],"ans":1},{"id":68,"sec":"General Intelligence & Reasoning","q":"In a family, A is the mother of B. C is the brother of A. D is the daughter of C. E is the father of A. How is D related to B?","opts":["Sister","Cousin","Aunt","Niece"],"ans":1},{"id":69,"sec":"General Intelligence & Reasoning","q":"Find the missing number: 2, 5, 11, 23, 47, ?","opts":["71","83","95","97"],"ans":2},{"id":70,"sec":"English Language & Comprehension","q":"Select the antonym of 'Transient'.","opts":["Temporary","Brief","Permanent","Uncertain"],"ans":2},{"id":71,"sec":"Quantitative Aptitude","q":"A man invests ₹x at 8% simple interest for 3 years and ₹(x + 2,000) at 10% simple interest for 2 years. If the total interest earned is ₹3,360, find x.","opts":["₹4,000","₹5,000","₹6,000","₹7,000"],"ans":1},{"id":72,"sec":"English Language & Comprehension","q":"Choose the correct improvement: 'If I would have known about the delay, I would not have come.'","opts":["If I had known about the delay, I would not have come.","If I knew about the delay, I would not have come.","If I have known about the delay, I would not come.","No improvement"],"ans":0},{"id":73,"sec":"General Intelligence & Reasoning","q":"If the positions of the first and second letters, third and fourth letters, and so on are interchanged in the word 'COMPUTER', which letter will be fourth from the left?","opts":["M","P","U","T"],"ans":1},{"id":74,"sec":"English Language & Comprehension","q":"Choose the correctly spelt word.","opts":["Conscientious","Consciencious","Conscentious","Conscientous"],"ans":0},{"id":75,"sec":"General Intelligence & Reasoning","q":"A man starts from a point, walks 8 km north, turns right and walks 6 km, turns right and walks 8 km, then turns left and walks 3 km. How far and in which direction is he from the starting point?","opts":["9 km east","3 km east","6 km west","9 km west"],"ans":0},{"id":76,"sec":"General Awareness","q":"Which of the following is NOT a Fundamental Duty under Article 51A?","opts":["To protect the natural environment","To develop scientific temper","To vote in every election","To preserve the rich heritage of the country's composite culture"],"ans":2},{"id":77,"sec":"Quantitative Aptitude","q":"The present ages of A and B are in the ratio 5:7. Six years from now, their ages will be in the ratio 3:4. What is B's present age?","opts":["24 years","28 years","30 years","35 years"],"ans":1},{"id":78,"sec":"General Intelligence & Reasoning","q":"Statements: All laptops are machines. Some machines are expensive. No expensive thing is disposable. Conclusions: I. Some laptops are not disposable. II. Some machines are not disposable. Which conclusion follows?","opts":["Only I","Only II","Both I and II","Neither I nor II"],"ans":1},{"id":79,"sec":"Quantitative Aptitude","q":"A train 180 metres long crosses a platform 270 metres long in 18 seconds. If the same train crosses a man walking in the opposite direction at 6 km/h in 9 seconds, what is the speed of the train?","opts":["54 km/h","60 km/h","66 km/h","72 km/h"],"ans":1},{"id":80,"sec":"Quantitative Aptitude","q":"The marked price of an article is 60% above its cost price. After allowing a discount of 20%, the seller still makes a profit of ₹240. What is the cost price?","opts":["₹1,800","₹2,000","₹2,400","₹3,000"],"ans":1},{"id":81,"sec":"General Intelligence & Reasoning","q":"In a certain code language, 'MOBILE PHONE' is written as '13-15-2-9-12-5 16-8-15-14-5'. Following the same pattern, how will 'COMPUTER' be written?","opts":["3-15-13-16-21-20-5-18","4-15-13-17-21-20-5-18","3-14-13-16-22-20-5-18","3-15-14-16-21-20-6-18"],"ans":0},{"id":82,"sec":"Quantitative Aptitude","q":"A vessel contains a mixture of milk and water in the ratio 7:3. If 20 litres of the mixture are removed and replaced with water, the ratio becomes 7:5. What was the original quantity of the mixture?","opts":["80 L","90 L","100 L","120 L"],"ans":2},{"id":83,"sec":"General Intelligence & Reasoning","q":"Choose the pair that is different from the other three:","opts":["64 : 8","121 : 11","169 : 13","225 : 14"],"ans":3},{"id":84,"sec":"Quantitative Aptitude","q":"The sum of the first 25 odd natural numbers is:","opts":["525","600","625","650"],"ans":2},{"id":85,"sec":"Quantitative Aptitude","q":"A sum becomes ₹14,520 in 2 years at 10% compound interest per annum, compounded annually. What is the principal?","opts":["₹11,000","₹12,000","₹12,500","₹13,000"],"ans":1},{"id":86,"sec":"Quantitative Aptitude","q":"If the radius of a cylinder is increased by 20% while its height remains unchanged, by what percentage does its curved surface area increase?","opts":["20%","40%","44%","48%"],"ans":0},{"id":87,"sec":"General Awareness","q":"Which planet has the shortest orbital period around the Sun?","opts":["Earth","Mars","Mercury","Venus"],"ans":2},{"id":88,"sec":"English Language & Comprehension","q":"Choose the correct passive voice: 'The authorities will have completed the inspection by Friday.'","opts":["The inspection will have completed by the authorities by Friday.","The inspection will have been completed by the authorities by Friday.","The inspection would have been completed by Friday.","The authorities will be completed the inspection by Friday."],"ans":1},{"id":89,"sec":"English Language & Comprehension","q":"Identify the error: 'The principal, along with the teachers, were present at the ceremony.'","opts":["The principal","along with the teachers","were present","at the ceremony"],"ans":2},{"id":90,"sec":"Quantitative Aptitude","q":"The difference between compound interest and simple interest on a certain sum at 10% per annum for 2 years is ₹250. Find the principal.","opts":["₹20,000","₹25,000","₹30,000","₹35,000"],"ans":1},{"id":91,"sec":"English Language & Comprehension","q":"Choose the most appropriate word: 'The scientist's explanation was so ___ that even a complicated concept became easy to understand.'","opts":["lucid","opaque","ambiguous","erratic"],"ans":0},{"id":92,"sec":"General Awareness","q":"The SI unit of electric resistance is:","opts":["Volt","Ampere","Ohm","Watt"],"ans":2},{"id":93,"sec":"English Language & Comprehension","q":"Select the word opposite in meaning to 'Benevolent'.","opts":["Generous","Compassionate","Malevolent","Helpful"],"ans":2},{"id":94,"sec":"General Intelligence & Reasoning","q":"Seven books P, Q, R, S, T, U and V are arranged from left to right. P is to the left of Q but right of S. T is right of Q. U is between S and P. Which book must be first?","opts":["P","Q","S","U"],"ans":2},{"id":95,"sec":"Quantitative Aptitude","q":"The average age of 12 students is 16 years. When the class teacher's age is included, the average becomes 18 years. If a new student replaces one student whose age is 15 years, the average of the 12 students becomes 16.5 years. What is the age of the new student?","opts":["18 years","20 years","21 years","22 years"],"ans":2},{"id":96,"sec":"General Awareness","q":"Which Indian state has the longest coastline?","opts":["Andhra Pradesh","Gujarat","Tamil Nadu","Maharashtra"],"ans":1},{"id":97,"sec":"English Language & Comprehension","q":"Choose the correct article: 'He is ___ European who works for ___ international organization.'","opts":["a, an","an, a","the, an","a, the"],"ans":0},{"id":98,"sec":"General Awareness","q":"Which of the following pairs is correctly matched?","opts":["First Battle of Panipat — 1556","Battle of Plassey — 1757","Battle of Buxar — 1761","Battle of Haldighati — 1764"],"ans":1},{"id":99,"sec":"General Intelligence & Reasoning","q":"In a certain pattern, ROAD is coded as 18-15-1-4 and HOME as 8-15-13-5. What is the code for TRAIN?","opts":["20-18-1-9-14","20-17-1-9-14","19-18-1-9-14","20-18-2-9-14"],"ans":0},{"id":100,"sec":"General Awareness","q":"The headquarters of the International Monetary Fund is located in:","opts":["Geneva","New York","Washington, D.C.","Paris"],"ans":2}];
+// SSC CGL Tier-I mock question bank — 100 questions.
+// 25 each: Reasoning, General Awareness, Quantitative Aptitude, English.
+// Modelled on previous-year SSC CGL Tier-I patterns and difficulty.
+// Every computable answer in this file is verified by tools/verify-questions.js.
+
+window.QUESTIONS = [
+
+/* ---------------- GENERAL INTELLIGENCE & REASONING (1-25) ---------------- */
+
+{id:1, sec:"General Intelligence & Reasoning",
+ q:"Select the number that will come next in the series: 6, 11, 21, 36, 56, ?",
+ opts:["71","76","81","86"], ans:2},
+
+{id:2, sec:"General Intelligence & Reasoning",
+ q:"Select the number that will come next in the series: 5, 11, 23, 47, ?",
+ opts:["95","91","89","99"], ans:0},
+
+{id:3, sec:"General Intelligence & Reasoning",
+ q:"Select the number that will come next in the series: 2, 5, 10, 17, 26, ?",
+ opts:["35","36","38","37"], ans:3},
+
+{id:4, sec:"General Intelligence & Reasoning",
+ q:"Select the letter that will come next in the series: B, D, G, K, P, ?",
+ opts:["V","T","U","W"], ans:0},
+
+{id:5, sec:"General Intelligence & Reasoning",
+ q:"Select the pair that will come next in the series: AZ, CX, EV, ?",
+ opts:["FU","HS","GT","GU"], ans:2},
+
+{id:6, sec:"General Intelligence & Reasoning",
+ q:"In a certain code language, TIGER is written as UJHFS. How will LION be written in that code?",
+ opts:["MJOP","MIPO","NJPO","MJPO"], ans:3},
+
+{id:7, sec:"General Intelligence & Reasoning",
+ q:"In a certain code language, FLOWER is written as REWOLF. How will GARDEN be written in that code?",
+ opts:["NEDRAG","NEDRGA","NDERAG","NEDARG"], ans:0},
+
+{id:8, sec:"General Intelligence & Reasoning",
+ q:"If each letter of the English alphabet is assigned its position value (A = 1, B = 2, ... Z = 26), what is the sum of the letters of the word 'MAT'?",
+ opts:["32","34","33","35"], ans:1},
+
+{id:9, sec:"General Intelligence & Reasoning",
+ q:"Select the option that is related to the third number in the same way as the second number is related to the first number.  7 : 343 :: 9 : ?",
+ opts:["512","648","810","729"], ans:3},
+
+{id:10, sec:"General Intelligence & Reasoning",
+ q:"Select the option that is related to the third number in the same way as the second number is related to the first number.  15 : 225 :: 18 : ?",
+ opts:["324","288","306","342"], ans:0},
+
+{id:11, sec:"General Intelligence & Reasoning",
+ q:"Select the option that is related to the third word in the same way as the second word is related to the first word.  Ornithology : Birds :: Entomology : ?",
+ opts:["Fishes","Reptiles","Insects","Plants"], ans:2},
+
+{id:12, sec:"General Intelligence & Reasoning",
+ q:"Select the number that does NOT belong to the group: 121, 144, 169, 180",
+ opts:["121","180","144","169"], ans:1},
+
+{id:13, sec:"General Intelligence & Reasoning",
+ q:"Select the number that does NOT belong to the group: 31, 37, 41, 51",
+ opts:["31","37","51","41"], ans:2},
+
+{id:14, sec:"General Intelligence & Reasoning",
+ q:"Three of the following four cities are alike in that each is a major seaport. Select the one that is different.",
+ opts:["Kolkata","Delhi","Chennai","Mumbai"], ans:1},
+
+{id:15, sec:"General Intelligence & Reasoning",
+ q:"In a row of 45 students, Ravi is 18th from the left end. What is his position from the right end?",
+ opts:["27","29","28","30"], ans:2},
+
+{id:16, sec:"General Intelligence & Reasoning",
+ q:"In a class, Meena's rank is 12th from the top and 20th from the bottom. How many students are there in the class?",
+ opts:["30","31","32","33"], ans:1},
+
+{id:17, sec:"General Intelligence & Reasoning",
+ q:"Pointing to a photograph, a man said, \"She is the daughter of my grandfather's only son.\" How is the girl in the photograph related to the man?",
+ opts:["Daughter","Niece","Cousin","Sister"], ans:3},
+
+{id:18, sec:"General Intelligence & Reasoning",
+ q:"A is the brother of B. C is the mother of A. D is the father of C. How is D related to B?",
+ opts:["Father","Uncle","Grandfather","Brother"], ans:2},
+
+{id:19, sec:"General Intelligence & Reasoning",
+ q:"A man walks 10 m towards the north, then turns right and walks 15 m, then turns right again and walks 10 m. How far and in which direction is he from his starting point?",
+ opts:["15 m towards the east","15 m towards the west","25 m towards the east","10 m towards the north"], ans:0},
+
+{id:20, sec:"General Intelligence & Reasoning",
+ q:"A girl facing north turns 90° clockwise, then turns 180°, and finally turns 90° anticlockwise. Which direction is she facing now?",
+ opts:["North","East","South","West"], ans:2},
+
+{id:21, sec:"General Intelligence & Reasoning",
+ q:"Statements: All roses are flowers. Some flowers fade quickly.  Conclusions: I. Some roses fade quickly.  II. All flowers are roses.  Which conclusion(s) logically follow(s)?",
+ opts:["Only conclusion I follows","Only conclusion II follows","Both conclusions follow","Neither conclusion follows"], ans:3},
+
+{id:22, sec:"General Intelligence & Reasoning",
+ q:"Statements: All cats are animals. All animals are living things.  Conclusions: I. All cats are living things.  II. All living things are cats.  Which conclusion(s) logically follow(s)?",
+ opts:["Only conclusion I follows","Only conclusion II follows","Both conclusions follow","Neither conclusion follows"], ans:0},
+
+{id:23, sec:"General Intelligence & Reasoning",
+ q:"A cube painted on all its faces is cut into 27 identical smaller cubes. How many of the smaller cubes have exactly two faces painted?",
+ opts:["6","8","24","12"], ans:3},
+
+{id:24, sec:"General Intelligence & Reasoning",
+ q:"If '+' means '÷', '÷' means '−', '−' means '×' and '×' means '+', then what is the value of 16 + 4 ÷ 5 − 2 × 6 ?",
+ opts:["−2","2","0","4"], ans:2},
+
+{id:25, sec:"General Intelligence & Reasoning",
+ q:"Arrange the following words in the order in which they appear in an English dictionary.  1. Precious  2. Precise  3. Precedent  4. Preclude",
+ opts:["3, 1, 2, 4","1, 2, 3, 4","3, 4, 1, 2","4, 3, 1, 2"], ans:0},
+
+/* ------------------------- GENERAL AWARENESS (26-50) ------------------------- */
+
+{id:26, sec:"General Awareness",
+ q:"Which Article of the Constitution of India guarantees the Right to Constitutional Remedies?",
+ opts:["Article 19","Article 21","Article 32","Article 44"], ans:2},
+
+{id:27, sec:"General Awareness",
+ q:"The 42nd Constitutional Amendment Act, 1976 added which of the following words to the Preamble of the Indian Constitution?",
+ opts:["Sovereign and Democratic","Socialist, Secular and Integrity","Republic and Justice","Liberty and Equality"], ans:1},
+
+{id:28, sec:"General Awareness",
+ q:"The provisions relating to disqualification of members on the ground of defection are contained in which Schedule of the Constitution of India?",
+ opts:["Eighth Schedule","Ninth Schedule","Tenth Schedule","Eleventh Schedule"], ans:2},
+
+{id:29, sec:"General Awareness",
+ q:"The Fundamental Duties were incorporated into the Indian Constitution on the recommendation of which committee?",
+ opts:["Swaran Singh Committee","Sarkaria Commission","Balwant Rai Mehta Committee","Ashok Mehta Committee"], ans:0},
+
+{id:30, sec:"General Awareness",
+ q:"Who was the Chairman of the Drafting Committee of the Constituent Assembly of India?",
+ opts:["Dr. Rajendra Prasad","Jawaharlal Nehru","Sardar Vallabhbhai Patel","Dr. B. R. Ambedkar"], ans:3},
+
+{id:31, sec:"General Awareness",
+ q:"In which year was the Battle of Plassey fought?",
+ opts:["1757","1764","1739","1772"], ans:0},
+
+{id:32, sec:"General Awareness",
+ q:"Who founded the Arya Samaj in 1875?",
+ opts:["Raja Ram Mohan Roy","Swami Vivekananda","Swami Dayanand Saraswati","Ishwar Chandra Vidyasagar"], ans:2},
+
+{id:33, sec:"General Awareness",
+ q:"In which year was the Quit India Movement launched?",
+ opts:["1930","1942","1920","1935"], ans:1},
+
+{id:34, sec:"General Awareness",
+ q:"The Jallianwala Bagh massacre of 1919 took place in which city?",
+ opts:["Lahore","Delhi","Amritsar","Kanpur"], ans:2},
+
+{id:35, sec:"General Awareness",
+ q:"Which river is popularly known as the 'Sorrow of Bihar'?",
+ opts:["Gandak","Son","Damodar","Kosi"], ans:3},
+
+{id:36, sec:"General Awareness",
+ q:"The Tropic of Cancer passes through how many Indian states?",
+ opts:["6","7","8","9"], ans:2},
+
+{id:37, sec:"General Awareness",
+ q:"The Godavari river originates in which Indian state?",
+ opts:["Madhya Pradesh","Maharashtra","Karnataka","Telangana"], ans:1},
+
+{id:38, sec:"General Awareness",
+ q:"Which type of soil is considered most suitable for the cultivation of cotton in India?",
+ opts:["Laterite soil","Alluvial soil","Black soil","Red soil"], ans:2},
+
+{id:39, sec:"General Awareness",
+ q:"Kaziranga National Park, famous for the one-horned rhinoceros, is located in which state?",
+ opts:["West Bengal","Assam","Odisha","Arunachal Pradesh"], ans:1},
+
+{id:40, sec:"General Awareness",
+ q:"In which year was the Reserve Bank of India established?",
+ opts:["1935","1947","1949","1921"], ans:0},
+
+{id:41, sec:"General Awareness",
+ q:"In India, the repo rate is decided by which of the following?",
+ opts:["Ministry of Finance","Reserve Bank of India","NITI Aayog","SEBI"], ans:1},
+
+{id:42, sec:"General Awareness",
+ q:"NITI Aayog, established in 2015, replaced which of the following bodies?",
+ opts:["Finance Commission","Planning Commission","National Development Council","Election Commission"], ans:1},
+
+{id:43, sec:"General Awareness",
+ q:"Which gas is the most abundant in the Earth's atmosphere?",
+ opts:["Oxygen","Carbon dioxide","Nitrogen","Argon"], ans:2},
+
+{id:44, sec:"General Awareness",
+ q:"What is the chemical name of the compound commonly known as washing soda (Na₂CO₃·10H₂O)?",
+ opts:["Sodium bicarbonate","Sodium hydroxide","Sodium chloride","Sodium carbonate decahydrate"], ans:3},
+
+{id:45, sec:"General Awareness",
+ q:"Deficiency of which vitamin causes the disease scurvy?",
+ opts:["Vitamin A","Vitamin C","Vitamin D","Vitamin K"], ans:1},
+
+{id:46, sec:"General Awareness",
+ q:"What is the SI unit of electric current?",
+ opts:["Volt","Ohm","Ampere","Watt"], ans:2},
+
+{id:47, sec:"General Awareness",
+ q:"Which organ of the human body secretes the hormone insulin?",
+ opts:["Liver","Pancreas","Thyroid gland","Kidney"], ans:1},
+
+{id:48, sec:"General Awareness",
+ q:"The folk dance 'Bihu' is associated with which Indian state?",
+ opts:["Assam","Odisha","Manipur","Nagaland"], ans:0},
+
+{id:49, sec:"General Awareness",
+ q:"The Nobel Prize is NOT awarded in which of the following fields?",
+ opts:["Physics","Literature","Mathematics","Chemistry"], ans:2},
+
+{id:50, sec:"General Awareness",
+ q:"Which is the smallest bone in the human body?",
+ opts:["Stapes","Femur","Vomer","Radius"], ans:0},
+
+/* ----------------------- QUANTITATIVE APTITUDE (51-75) ----------------------- */
+
+{id:51, sec:"Quantitative Aptitude",
+ q:"The number 1200 is first increased by 25% and the result is then decreased by 20%. What is the final number?",
+ opts:["1150","1180","1250","1200"], ans:3},
+
+{id:52, sec:"Quantitative Aptitude",
+ q:"A shopkeeper buys an article for ₹800 and marks it 40% above the cost price. He then sells it after allowing a discount of 15%. What is his profit percentage?",
+ opts:["17%","19%","18%","20%"], ans:1},
+
+{id:53, sec:"Quantitative Aptitude",
+ q:"What is the difference between the compound interest and the simple interest on ₹8,000 for 2 years at 10% per annum, interest compounded annually?",
+ opts:["₹60","₹72","₹80","₹88"], ans:2},
+
+{id:54, sec:"Quantitative Aptitude",
+ q:"A can complete a piece of work in 12 days and B can complete the same work in 18 days. Working together, in how many days will they complete the work?",
+ opts:["7 1/5 days","7 1/2 days","8 days","6 2/3 days"], ans:0},
+
+{id:55, sec:"Quantitative Aptitude",
+ q:"Pipe A can fill a tank in 6 hours and pipe B can fill the same tank in 8 hours. If both pipes are opened together, in how much time will the tank be filled?",
+ opts:["3 1/2 hours","4 hours","3 3/7 hours","2 6/7 hours"], ans:2},
+
+{id:56, sec:"Quantitative Aptitude",
+ q:"A train 180 m long is running at a speed of 54 km/h. How much time will it take to cross a platform 270 m long?",
+ opts:["24 seconds","27 seconds","33 seconds","30 seconds"], ans:3},
+
+{id:57, sec:"Quantitative Aptitude",
+ q:"The speed of a boat in still water is 10 km/h and the speed of the stream is 2 km/h. How long will the boat take to travel 48 km downstream?",
+ opts:["3 hours","5 hours","4 hours","6 hours"], ans:2},
+
+{id:58, sec:"Quantitative Aptitude",
+ q:"The average of 5 numbers is 27. If one of the numbers is removed, the average of the remaining 4 numbers becomes 25. What is the number that was removed?",
+ opts:["30","35","32","37"], ans:1},
+
+{id:59, sec:"Quantitative Aptitude",
+ q:"If A : B = 3 : 4 and B : C = 6 : 7, then what is A : B : C?",
+ opts:["9 : 12 : 14","3 : 4 : 6","6 : 8 : 7","9 : 12 : 16"], ans:0},
+
+{id:60, sec:"Quantitative Aptitude",
+ q:"A invests ₹12,000 in a business for 12 months and B invests ₹18,000 for 8 months. If the total annual profit is ₹24,000, what is A's share of the profit?",
+ opts:["₹10,000","₹14,000","₹12,000","₹16,000"], ans:2},
+
+{id:61, sec:"Quantitative Aptitude",
+ q:"A 40-litre mixture of milk and water contains milk and water in the ratio 3 : 1. How much water must be added so that the ratio of milk to water becomes 3 : 2?",
+ opts:["8 litres","12 litres","15 litres","10 litres"], ans:3},
+
+{id:62, sec:"Quantitative Aptitude",
+ q:"If x + 1/x = 5, then what is the value of x² + 1/x² ?",
+ opts:["21","25","23","27"], ans:2},
+
+{id:63, sec:"Quantitative Aptitude",
+ q:"If a + b = 10 and ab = 21, then what is the value of a³ + b³ ?",
+ opts:["340","400","430","370"], ans:3},
+
+{id:64, sec:"Quantitative Aptitude",
+ q:"What is the area of a triangle whose sides measure 13 cm, 14 cm and 15 cm?",
+ opts:["80 cm²","84 cm²","88 cm²","92 cm²"], ans:1},
+
+{id:65, sec:"Quantitative Aptitude",
+ q:"What is the area of a sector of a circle of radius 7 cm with a central angle of 90°? (Take π = 22/7)",
+ opts:["35 cm²","42 cm²","38.5 cm²","49 cm²"], ans:2},
+
+{id:66, sec:"Quantitative Aptitude",
+ q:"What is the curved surface area of a cylinder of radius 7 cm and height 10 cm? (Take π = 22/7)",
+ opts:["400 cm²","480 cm²","540 cm²","440 cm²"], ans:3},
+
+{id:67, sec:"Quantitative Aptitude",
+ q:"The volume of a cube is 1728 cm³. What is its total surface area?",
+ opts:["720 cm²","864 cm²","780 cm²","900 cm²"], ans:1},
+
+{id:68, sec:"Quantitative Aptitude",
+ q:"If sin θ = 3/5 and θ is an acute angle, then what is the value of tan θ ?",
+ opts:["4/3","3/4","4/5","5/3"], ans:1},
+
+{id:69, sec:"Quantitative Aptitude",
+ q:"What is the value of sin²30° + cos²60° ?",
+ opts:["1/4","3/4","1","1/2"], ans:3},
+
+{id:70, sec:"Quantitative Aptitude",
+ q:"The angle of elevation of the top of a vertical tower from a point on the ground is 30°. If the point is 30√3 metres from the foot of the tower, what is the height of the tower?",
+ opts:["30 metres","45 metres","60 metres","90 metres"], ans:0},
+
+{id:71, sec:"Quantitative Aptitude",
+ q:"What is the greatest number that divides both 200 and 320, leaving a remainder of 5 in each case?",
+ opts:["12","18","15","20"], ans:2},
+
+{id:72, sec:"Quantitative Aptitude",
+ q:"The HCF of two numbers is 12 and their LCM is 336. If one of the numbers is 84, what is the other number?",
+ opts:["36","56","60","48"], ans:3},
+
+{id:73, sec:"Quantitative Aptitude",
+ q:"What is the compound interest on ₹10,000 at 10% per annum for 2 years, compounded annually?",
+ opts:["₹2,000","₹2,100","₹2,200","₹2,310"], ans:1},
+
+{id:74, sec:"Quantitative Aptitude",
+ q:"What is the value of 15% of 480 + 25% of 320 ?",
+ opts:["142","148","158","152"], ans:3},
+
+{id:75, sec:"Quantitative Aptitude",
+ q:"A shopkeeper sells an article for ₹1,200 and gains 20%. What is the cost price of the article?",
+ opts:["₹960","₹1,050","₹1,000","₹1,080"], ans:2},
+
+/* -------------------- ENGLISH LANGUAGE & COMPREHENSION (76-100) -------------------- */
+
+{id:76, sec:"English Language & Comprehension",
+ q:"Select the word that is most nearly the SAME in meaning as the word 'BENEVOLENT'.",
+ opts:["Cruel","Generous","Selfish","Timid"], ans:1},
+
+{id:77, sec:"English Language & Comprehension",
+ q:"Select the word that is most nearly the SAME in meaning as the word 'ABUNDANT'.",
+ opts:["Scarce","Meagre","Plentiful","Rare"], ans:2},
+
+{id:78, sec:"English Language & Comprehension",
+ q:"Select the word that is most nearly the OPPOSITE in meaning to the word 'FRUGAL'.",
+ opts:["Thrifty","Economical","Careful","Extravagant"], ans:3},
+
+{id:79, sec:"English Language & Comprehension",
+ q:"Select the word that is most nearly the OPPOSITE in meaning to the word 'TRANSPARENT'.",
+ opts:["Opaque","Clear","Lucid","Visible"], ans:0},
+
+{id:80, sec:"English Language & Comprehension",
+ q:"Select the one word substitution for the given group of words: 'A person who cannot be corrected'.",
+ opts:["Incurable","Intolerable","Incorrigible","Invincible"], ans:2},
+
+{id:81, sec:"English Language & Comprehension",
+ q:"Select the one word substitution for the given group of words: 'A system of government by officials'.",
+ opts:["Aristocracy","Bureaucracy","Democracy","Autocracy"], ans:1},
+
+{id:82, sec:"English Language & Comprehension",
+ q:"Select the option that best expresses the meaning of the idiom: 'To let the cat out of the bag'.",
+ opts:["To create confusion","To reveal a secret","To act cruelly","To waste an opportunity"], ans:1},
+
+{id:83, sec:"English Language & Comprehension",
+ q:"Select the option that best expresses the meaning of the idiom: 'A blessing in disguise'.",
+ opts:["A hidden threat","A short-lived joy","An apparent misfortune that turns out to be beneficial","An undeserved reward"], ans:2},
+
+{id:84, sec:"English Language & Comprehension",
+ q:"Select the option that best expresses the meaning of the idiom: 'To beat about the bush'.",
+ opts:["To avoid coming to the main point","To search thoroughly","To punish severely","To work very hard"], ans:0},
+
+{id:85, sec:"English Language & Comprehension",
+ q:"Select the correctly spelt word.",
+ opts:["Accomodation","Acommodation","Accommadation","Accommodation"], ans:3},
+
+{id:86, sec:"English Language & Comprehension",
+ q:"Select the correctly spelt word from the options given below.",
+ opts:["Occurence","Occurrence","Ocurrence","Occurrance"], ans:1},
+
+{id:87, sec:"English Language & Comprehension",
+ q:"Select the part of the sentence that contains an error: 'One of my friend / is a doctor / in a government hospital. / No error'",
+ opts:["One of my friend","is a doctor","in a government hospital","No error"], ans:0},
+
+{id:88, sec:"English Language & Comprehension",
+ q:"Select the most appropriate option to fill in the blank: 'He has been living in this city ______ 2010.'",
+ opts:["for","from","since","by"], ans:2},
+
+{id:89, sec:"English Language & Comprehension",
+ q:"Select the most appropriate option to fill in the blank: 'She is very good ______ mathematics.'",
+ opts:["in","on","with","at"], ans:3},
+
+{id:90, sec:"English Language & Comprehension",
+ q:"Select the correct passive form of the sentence: 'The teacher punished the boy.'",
+ opts:["The boy is punished by the teacher","The boy was punished by the teacher","The boy has punished by the teacher","The boy was being punished by the teacher"], ans:1},
+
+{id:91, sec:"English Language & Comprehension",
+ q:"Select the correct indirect form of the sentence: He said, \"I am very busy today.\"",
+ opts:["He said that he is very busy today","He said that he was very busy that day","He says that he was very busy today","He told that he is very busy that day"], ans:1},
+
+{id:92, sec:"English Language & Comprehension",
+ q:"Select the option that best improves the underlined part of the sentence: 'He is senior <u>than me</u> in the office.'",
+ opts:["than mine","to me","from me","No improvement"], ans:1},
+
+{id:93, sec:"English Language & Comprehension",
+ q:"Select the most appropriate option to fill in the blank: 'Neither of the two boys ______ present in the class.'",
+ opts:["were","are","was","have"], ans:2},
+
+{id:94, sec:"English Language & Comprehension",
+ q:"Select the most appropriate option to fill in the blank: 'He was accused ______ theft by his employer.'",
+ opts:["for","of","with","by"], ans:1},
+
+{id:95, sec:"English Language & Comprehension",
+ q:"Select the word that is most nearly the SAME in meaning as the word 'METICULOUS'.",
+ opts:["Careless","Hasty","Rough","Careful"], ans:3},
+
+{id:96, sec:"English Language & Comprehension",
+ q:"Select the word that is most nearly the OPPOSITE in meaning to the word 'OPTIMIST'.",
+ opts:["Realist","Pessimist","Idealist","Humanist"], ans:1},
+
+{id:97, sec:"English Language & Comprehension",
+ q:"Select the one word substitution for the given group of words: 'A place where bees are kept'.",
+ opts:["Aviary","Byre","Apiary","Kennel"], ans:2},
+
+{id:98, sec:"English Language & Comprehension",
+ q:"Select the option that best expresses the meaning of the idiom: 'To burn the midnight oil'.",
+ opts:["To waste money","To study or work late into the night","To quarrel bitterly","To travel at night"], ans:1},
+
+{id:99, sec:"English Language & Comprehension",
+ q:"Select the most appropriate option to fill in the blank: 'If I ______ rich, I would travel around the world.'",
+ opts:["am","was","were","will be"], ans:2},
+
+{id:100, sec:"English Language & Comprehension",
+ q:"Select the most appropriate option to fill in the blank: 'He is ______ university student from Delhi.'",
+ opts:["a","an","the","no article"], ans:0}
+
+];
