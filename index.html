@@ -118,7 +118,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px so
       <p class="small">Keep this tab open. The examiner will start the mock.</p>
     </div>
     <div id="candidateExam" class="hidden">
-      <div class="notice"><b id="sectionTitle"></b> · Fixed 15-minute timer. When it reaches zero, this section locks and the next section opens automatically.</div>
+      <div class="notice"><b id="sectionTitle"></b> · When the timer hits zero this section locks and the next opens automatically. Finished early? Use <b>Submit Section &amp; Continue</b> — you cannot return to a submitted section.</div>
       <div class="layout">
         <main class="card">
           <div class="qmeta"><span id="qCounter"></span><span id="qSection" class="badge"></span></div>
@@ -129,6 +129,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px so
             <button class="secondary" onclick="prevQ()">Previous</button>
             <button class="secondary" onclick="markReview()">Mark for Review</button>
             <button class="primary" onclick="nextQ()">Save & Next</button>
+            <button class="green" id="submitSectionBtn" onclick="submitSection()">Submit Section &amp; Continue</button>
             <button class="danger hidden" id="soloEnd" onclick="endSolo()">Submit Test</button>
           </div>
         </main>
@@ -178,6 +179,11 @@ let soloMode = new URLSearchParams(location.search).get("solo") === "1";
 let user = null, roomData = null, candidateId = null, candidateData = null, selectedCandidate = null;
 let section = 0, localQ = 0, answers = {}, reviews = {};
 let timerHandle = null;
+// Sections normally advance on the wall clock. A candidate who submits early
+// jumps ahead of it, so the effective section is whichever is further along —
+// which also means a submitted section can never be re-entered.
+let manualSection = 0, examDone = false;
+function effSection(elapsed){return Math.min(3,Math.max(Math.floor(elapsed/900000),manualSection))}
 
 const $ = id => document.getElementById(id);
 function show(id){$(id).classList.remove("hidden")} function hide(id){$(id).classList.add("hidden")}
@@ -214,6 +220,7 @@ async function boot(){
 }
 function startSolo(){
   roomData={status:"running",startAt:Date.now()};
+  manualSection=0; examDone=false;
   candidateData={name:"Practice",section:0,question:0,answers:{},reviews:{}};
   // Share the same objects so the section rollover below can't clobber answers.
   section=0; localQ=0; answers=candidateData.answers; reviews=candidateData.reviews;
@@ -222,14 +229,42 @@ function startSolo(){
   renderCandidate();
   runTimerFromStart();
 }
-function endSolo(){
+function finishExam(){
+  if(examDone)return;
+  examDone=true;
   clearInterval(timerHandle);
   hide("candidateExam"); hide("candidateWaiting"); show("candidateResult");
   $("timer").textContent="DONE";
+  if(!soloMode&&roomId&&candidateId){
+    update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),{status:"finished",finishedAt:Date.now()});
+  }
   showResult();
   window.scrollTo(0,0);
 }
-window.endSolo=()=>{if(confirm("Submit and see your score?")) endSolo()};
+window.endSolo=()=>{if(confirm("Submit the whole test and see your score?")) finishExam()};
+// Hand in the current section early and open the next one. No going back.
+window.submitSection=()=>{
+  if(examDone)return;
+  if(section>=3){
+    if(confirm("Submit the final section and finish the test?")) finishExam();
+    return;
+  }
+  const left=25-Object.keys(answers).filter(id=>{
+    const gi=QUESTIONS.findIndex(q=>String(q.id)===String(id));
+    return gi>=section*25&&gi<section*25+25;
+  }).length;
+  const warn=left>0?`\n\n${left} question${left===1?"":"s"} in this section ${left===1?"is":"are"} still unanswered.`:"";
+  if(!confirm(`Submit "${SECTIONS[section]}" and move on to "${SECTIONS[section+1]}"?${warn}\n\nYou cannot come back to this section.`))return;
+  manualSection=section+1;
+  section=manualSection;
+  localQ=0;
+  if(candidateData) candidateData.section=section;
+  if(!soloMode&&roomId&&candidateId){
+    update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),{section,question:0,manualSection});
+  }
+  renderCandidate();
+  window.scrollTo(0,0);
+};
 async function adminLogin(){
   try{
     const c=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value);
@@ -374,6 +409,7 @@ function watchRoomForCandidate(){
     if(c) candidateData=c;
     if(roomData.status==="waiting"){hide("candidateExam");show("candidateWaiting");$("timer").textContent="WAIT";}
     else if(roomData.status==="running"){
+      if(examDone)return; // Already handed in; don't drag them back into the paper.
       hide("candidateWaiting"); show("candidateExam");
       syncPositionFromServer();
       runTimerFromStart();
@@ -386,12 +422,13 @@ function watchRoomForCandidate(){
 function syncPositionFromServer(){
   if(!roomData.startAt)return;
   const elapsed=Math.max(0,Date.now()-roomData.startAt);
-  const s=Math.min(3,Math.floor(elapsed/900000));
+  manualSection=Math.max(manualSection,Number(candidateData?.manualSection||0));
+  const s=effSection(elapsed);
   section=s;
   if(candidateData?.section!==section){
     candidateData.section=section;
     localQ=0;
-    if(!soloMode) update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),{section,question:0});
+    if(!soloMode) update(ref(db,`rooms/${roomId}/candidates/${candidateId}`),{section,question:0,manualSection});
   }else localQ=Math.min(24,Number(candidateData.question||0));
   answers=candidateData.answers||{}; reviews=candidateData.reviews||{};
   renderCandidate();
@@ -399,13 +436,14 @@ function syncPositionFromServer(){
 function runTimerFromStart(){
   clearInterval(timerHandle);
   timerHandle=setInterval(()=>{
-    if(!roomData?.startAt)return;
+    if(!roomData?.startAt||examDone)return;
     const elapsed=Math.max(0,Date.now()-roomData.startAt);
-    const s=Math.min(3,Math.floor(elapsed/900000));
-    const secLeft=900-Math.floor((elapsed%900000)/1000);
+    const s=effSection(elapsed);
+    // Time left in the section the candidate is actually sitting in.
+    const secLeft=Math.max(0,Math.round(((s+1)*900000-elapsed)/1000));
     $("timer").textContent=fmt(secLeft);
     if(s!==section){section=s;localQ=0;syncPositionFromServer();}
-    if(elapsed>=3600000){clearInterval(timerHandle); if(soloMode)endSolo(); else showResult();}
+    if(elapsed>=3600000){clearInterval(timerHandle); finishExam();}
   },250);
 }
 function fmt(x){x=Math.max(0,x);return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0")}
@@ -416,6 +454,8 @@ function persist(){
 }
 function renderCandidate(){
   const q=currentQ(); $("sectionTitle").textContent=SECTIONS[section];
+  const sb=$("submitSectionBtn");
+  if(sb) sb.textContent = section>=3 ? "Submit Test" : `Submit Section & Continue`;
   $("qCounter").textContent=`Question ${localQ+1} of 25`; $("qSection").textContent=SECTIONS[section];
   $("qbar").style.width=((localQ+1)/25*100)+"%"; $("question").textContent=q.q;
   $("options").innerHTML=q.opts.map((o,i)=>`<label class="opt"><input type="radio" name="a" value="${i}" ${answers[q.id]===i?"checked":""}> ${String.fromCharCode(65+i)}. ${o}</label>`).join("");
