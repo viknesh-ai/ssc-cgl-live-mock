@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/*
+ * One quiet palette, used consistently:
+ *   ink       — text and primary actions
+ *   accent    — the single interactive blue (selection, focus, links)
+ *   ok/warn/bad — reserved for real meaning: correct, caution, wrong
+ * Colour is information here, not decoration, so nothing else is tinted.
+ */
+@theme {
+  --color-canvas: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-subtle: #fafbfc;
+  --color-line: #e5e7eb;
+  --color-line-strong: #cfd4dc;
+
+  --color-ink: #16181d;
+  --color-ink-2: #545c6b;
+  --color-ink-3: #8a919e;
+
+  --color-accent: #1d4ed8;
+  --color-accent-soft: #eef3ff;
+
+  --color-ok: #067647;
+  --color-ok-soft: #ecfdf3;
+  --color-warn: #b54708;
+  --color-warn-soft: #fffaeb;
+  --color-bad: #b42318;
+  --color-bad-soft: #fef3f2;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Numbers that change every second must not make the layout twitch. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+}
+
+/* Scrollable panes keep a slim, unobtrusive scrollbar. */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}

@@ -1,0 +1,49 @@
+{
+  "name": "ssc-cgl-live-mock",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SSC CGL Tier-I live mock exam platform with proctoring and AI answer review",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false server.ts",
+    "build": "prisma generate && next build",
+    "start": "NODE_ENV=production tsx server.ts",
+    "release": "prisma migrate deploy && tsx prisma/seed.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "firebase": "^12.17.1",
+    "jose": "^6.2.8",
+    "lucide-react": "^1.31.0",
+    "next": "^16.3.1",
+    "pg": "^8.16.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tsx": "^4.23.12",
+    "ws": "^8.21.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.2.0",
+    "@types/pg": "^8.15.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@types/ws": "^8.18.1",
+    "dotenv": "^17.2.4",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.1",
+    "postcss": "^8.5.26",
+    "prisma": "^7.9.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  }
+}

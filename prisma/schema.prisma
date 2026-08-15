@@ -1,0 +1,182 @@
+// SSC CGL Tier-I live mock — data model.
+//
+// Everything the exam needs lives in Postgres: the question bank and its answer
+// key, exam rooms, per-candidate papers, answers, chat and cached AI
+// explanations. Firebase is used only to prove who the signed-in person is.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Section {
+  REASONING
+  GENERAL_AWARENESS
+  QUANTITATIVE
+  ENGLISH
+}
+
+enum Role {
+  CANDIDATE
+  EXAMINER
+}
+
+enum RoomStatus {
+  WAITING
+  RUNNING
+  PAUSED
+  ENDED
+}
+
+enum AttemptMode {
+  LIVE
+  SOLO
+}
+
+enum AttemptStatus {
+  WAITING
+  IN_PROGRESS
+  SUBMITTED
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  firebaseUid String  @unique
+  email      String   @unique
+  name       String
+  photoUrl   String?
+  role       Role     @default(CANDIDATE)
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  attempts     Attempt[]
+  roomsCreated Room[]         @relation("RoomExaminer")
+  messages     ChatMessage[]
+  seen         SeenQuestion[]
+}
+
+model Question {
+  id          Int      @id @default(autoincrement())
+  section     Section
+  text        String
+  options     String[]
+  answerIndex Int
+  createdAt   DateTime @default(now())
+
+  explanation  Explanation?
+  attemptItems AttemptQuestion[]
+  seenBy       SeenQuestion[]
+
+  @@index([section])
+}
+
+/// AI explanation for a question, generated once and reused for every candidate.
+model Explanation {
+  id         Int      @id @default(autoincrement())
+  questionId Int      @unique
+  content    String
+  model      String
+  createdAt  DateTime @default(now())
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+/// Questions a candidate has already been served, so repeat attempts draw fresh ones.
+model SeenQuestion {
+  userId     Int
+  questionId Int
+  seenAt     DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, questionId])
+}
+
+model Room {
+  id             Int        @id @default(autoincrement())
+  code           String     @unique
+  title          String     @default("SSC CGL Tier-I Mock")
+  status         RoomStatus @default(WAITING)
+  sectionMinutes Int        @default(15)
+  examinerId     Int
+  startedAt      DateTime?
+  pausedAt       DateTime?
+  endedAt        DateTime?
+  createdAt      DateTime   @default(now())
+
+  examiner User          @relation("RoomExaminer", fields: [examinerId], references: [id])
+  attempts Attempt[]
+  messages ChatMessage[]
+
+  @@index([status])
+}
+
+model Attempt {
+  id     Int         @id @default(autoincrement())
+  userId Int
+  roomId Int?
+  mode   AttemptMode @default(LIVE)
+  status AttemptStatus @default(WAITING)
+
+  sectionMinutes Int  @default(15)
+  /// 0-3; which section the candidate is inside right now.
+  currentSection Int  @default(0)
+  /// 0-24; position inside the current section.
+  currentIndex   Int  @default(0)
+  /// Each section gets its own fresh clock, set when the candidate enters it.
+  sectionStartedAt DateTime?
+  /// Milliseconds the current section spent paused, added back to its deadline.
+  pausedMs       Int  @default(0)
+  tabSwitches    Int  @default(0)
+
+  joinedAt    DateTime  @default(now())
+  submittedAt DateTime?
+  totalScore  Float?
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room     Room?             @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  items    AttemptQuestion[]
+  messages ChatMessage[]
+
+  @@unique([roomId, userId])
+  @@index([userId])
+}
+
+/// One drawn question on one candidate's paper, plus what they answered.
+model AttemptQuestion {
+  id         Int       @id @default(autoincrement())
+  attemptId  Int
+  questionId Int
+  /// 0-99 across the whole paper; order / 25 is the section.
+  order      Int
+  selected   Int?
+  marked     Boolean   @default(false)
+  answeredAt DateTime?
+
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@unique([attemptId, order])
+  @@index([attemptId])
+}
+
+model ChatMessage {
+  id           Int      @id @default(autoincrement())
+  roomId       Int
+  attemptId    Int
+  senderId     Int
+  fromExaminer Boolean
+  body         String
+  createdAt    DateTime @default(now())
+
+  room    Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  sender  User    @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId, createdAt])
+}

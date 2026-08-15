@@ -1,0 +1,1102 @@
+[
+  {
+    "section": "REASONING",
+    "text": "Select the number that will come next in the series: 6, 11, 21, 36, 56, ?",
+    "options": [
+      "71",
+      "76",
+      "81",
+      "86"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the number that will come next in the series: 5, 11, 23, 47, ?",
+    "options": [
+      "95",
+      "91",
+      "89",
+      "99"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the number that will come next in the series: 2, 5, 10, 17, 26, ?",
+    "options": [
+      "35",
+      "36",
+      "38",
+      "37"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the letter that will come next in the series: B, D, G, K, P, ?",
+    "options": [
+      "V",
+      "T",
+      "U",
+      "W"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the pair that will come next in the series: AZ, CX, EV, ?",
+    "options": [
+      "FU",
+      "HS",
+      "GT",
+      "GU"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "In a certain code language, TIGER is written as UJHFS. How will LION be written in that code?",
+    "options": [
+      "MJOP",
+      "MIPO",
+      "NJPO",
+      "MJPO"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "REASONING",
+    "text": "In a certain code language, FLOWER is written as REWOLF. How will GARDEN be written in that code?",
+    "options": [
+      "NEDRAG",
+      "NEDRGA",
+      "NDERAG",
+      "NEDARG"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "REASONING",
+    "text": "If each letter of the English alphabet is assigned its position value (A = 1, B = 2, ... Z = 26), what is the sum of the letters of the word 'MAT'?",
+    "options": [
+      "32",
+      "34",
+      "33",
+      "35"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the option that is related to the third number in the same way as the second number is related to the first number.  7 : 343 :: 9 : ?",
+    "options": [
+      "512",
+      "648",
+      "810",
+      "729"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the option that is related to the third number in the same way as the second number is related to the first number.  15 : 225 :: 18 : ?",
+    "options": [
+      "324",
+      "288",
+      "306",
+      "342"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the option that is related to the third word in the same way as the second word is related to the first word.  Ornithology : Birds :: Entomology : ?",
+    "options": [
+      "Fishes",
+      "Reptiles",
+      "Insects",
+      "Plants"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the number that does NOT belong to the group: 121, 144, 169, 180",
+    "options": [
+      "121",
+      "180",
+      "144",
+      "169"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "REASONING",
+    "text": "Select the number that does NOT belong to the group: 31, 37, 41, 51",
+    "options": [
+      "31",
+      "37",
+      "51",
+      "41"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "Three of the following four cities are alike in that each is a major seaport. Select the one that is different.",
+    "options": [
+      "Kolkata",
+      "Delhi",
+      "Chennai",
+      "Mumbai"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "REASONING",
+    "text": "In a row of 45 students, Ravi is 18th from the left end. What is his position from the right end?",
+    "options": [
+      "27",
+      "29",
+      "28",
+      "30"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "In a class, Meena's rank is 12th from the top and 20th from the bottom. How many students are there in the class?",
+    "options": [
+      "30",
+      "31",
+      "32",
+      "33"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "REASONING",
+    "text": "Pointing to a photograph, a man said, \"She is the daughter of my grandfather's only son.\" How is the girl in the photograph related to the man?",
+    "options": [
+      "Daughter",
+      "Niece",
+      "Cousin",
+      "Sister"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "REASONING",
+    "text": "A is the brother of B. C is the mother of A. D is the father of C. How is D related to B?",
+    "options": [
+      "Father",
+      "Uncle",
+      "Grandfather",
+      "Brother"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "A man walks 10 m towards the north, then turns right and walks 15 m, then turns right again and walks 10 m. How far and in which direction is he from his starting point?",
+    "options": [
+      "15 m towards the east",
+      "15 m towards the west",
+      "25 m towards the east",
+      "10 m towards the north"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "REASONING",
+    "text": "A girl facing north turns 90° clockwise, then turns 180°, and finally turns 90° anticlockwise. Which direction is she facing now?",
+    "options": [
+      "North",
+      "East",
+      "South",
+      "West"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "Statements: All roses are flowers. Some flowers fade quickly.  Conclusions: I. Some roses fade quickly.  II. All flowers are roses.  Which conclusion(s) logically follow(s)?",
+    "options": [
+      "Only conclusion I follows",
+      "Only conclusion II follows",
+      "Both conclusions follow",
+      "Neither conclusion follows"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "REASONING",
+    "text": "Statements: All cats are animals. All animals are living things.  Conclusions: I. All cats are living things.  II. All living things are cats.  Which conclusion(s) logically follow(s)?",
+    "options": [
+      "Only conclusion I follows",
+      "Only conclusion II follows",
+      "Both conclusions follow",
+      "Neither conclusion follows"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "REASONING",
+    "text": "A cube painted on all its faces is cut into 27 identical smaller cubes. How many of the smaller cubes have exactly two faces painted?",
+    "options": [
+      "6",
+      "8",
+      "24",
+      "12"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "REASONING",
+    "text": "If '+' means '÷', '÷' means '−', '−' means '×' and '×' means '+', then what is the value of 16 + 4 ÷ 5 − 2 × 6 ?",
+    "options": [
+      "−2",
+      "2",
+      "0",
+      "4"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "REASONING",
+    "text": "Arrange the following words in the order in which they appear in an English dictionary.  1. Precious  2. Precise  3. Precedent  4. Preclude",
+    "options": [
+      "3, 1, 2, 4",
+      "1, 2, 3, 4",
+      "3, 4, 1, 2",
+      "4, 3, 1, 2"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Which Article of the Constitution of India guarantees the Right to Constitutional Remedies?",
+    "options": [
+      "Article 19",
+      "Article 21",
+      "Article 32",
+      "Article 44"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The 42nd Constitutional Amendment Act, 1976 added which of the following words to the Preamble of the Indian Constitution?",
+    "options": [
+      "Sovereign and Democratic",
+      "Socialist, Secular and Integrity",
+      "Republic and Justice",
+      "Liberty and Equality"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The provisions relating to disqualification of members on the ground of defection are contained in which Schedule of the Constitution of India?",
+    "options": [
+      "Eighth Schedule",
+      "Ninth Schedule",
+      "Tenth Schedule",
+      "Eleventh Schedule"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The Fundamental Duties were incorporated into the Indian Constitution on the recommendation of which committee?",
+    "options": [
+      "Swaran Singh Committee",
+      "Sarkaria Commission",
+      "Balwant Rai Mehta Committee",
+      "Ashok Mehta Committee"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Who was the Chairman of the Drafting Committee of the Constituent Assembly of India?",
+    "options": [
+      "Dr. Rajendra Prasad",
+      "Jawaharlal Nehru",
+      "Sardar Vallabhbhai Patel",
+      "Dr. B. R. Ambedkar"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "In which year was the Battle of Plassey fought?",
+    "options": [
+      "1757",
+      "1764",
+      "1739",
+      "1772"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Who founded the Arya Samaj in 1875?",
+    "options": [
+      "Raja Ram Mohan Roy",
+      "Swami Vivekananda",
+      "Swami Dayanand Saraswati",
+      "Ishwar Chandra Vidyasagar"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "In which year was the Quit India Movement launched?",
+    "options": [
+      "1930",
+      "1942",
+      "1920",
+      "1935"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The Jallianwala Bagh massacre of 1919 took place in which city?",
+    "options": [
+      "Lahore",
+      "Delhi",
+      "Amritsar",
+      "Kanpur"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Which river is popularly known as the 'Sorrow of Bihar'?",
+    "options": [
+      "Gandak",
+      "Son",
+      "Damodar",
+      "Kosi"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The Tropic of Cancer passes through how many Indian states?",
+    "options": [
+      "6",
+      "7",
+      "8",
+      "9"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The Godavari river originates in which Indian state?",
+    "options": [
+      "Madhya Pradesh",
+      "Maharashtra",
+      "Karnataka",
+      "Telangana"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Which type of soil is considered most suitable for the cultivation of cotton in India?",
+    "options": [
+      "Laterite soil",
+      "Alluvial soil",
+      "Black soil",
+      "Red soil"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Kaziranga National Park, famous for the one-horned rhinoceros, is located in which state?",
+    "options": [
+      "West Bengal",
+      "Assam",
+      "Odisha",
+      "Arunachal Pradesh"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "In which year was the Reserve Bank of India established?",
+    "options": [
+      "1935",
+      "1947",
+      "1949",
+      "1921"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "In India, the repo rate is decided by which of the following?",
+    "options": [
+      "Ministry of Finance",
+      "Reserve Bank of India",
+      "NITI Aayog",
+      "SEBI"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "NITI Aayog, established in 2015, replaced which of the following bodies?",
+    "options": [
+      "Finance Commission",
+      "Planning Commission",
+      "National Development Council",
+      "Election Commission"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Which gas is the most abundant in the Earth's atmosphere?",
+    "options": [
+      "Oxygen",
+      "Carbon dioxide",
+      "Nitrogen",
+      "Argon"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "What is the chemical name of the compound commonly known as washing soda (Na₂CO₃·10H₂O)?",
+    "options": [
+      "Sodium bicarbonate",
+      "Sodium hydroxide",
+      "Sodium chloride",
+      "Sodium carbonate decahydrate"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Deficiency of which vitamin causes the disease scurvy?",
+    "options": [
+      "Vitamin A",
+      "Vitamin C",
+      "Vitamin D",
+      "Vitamin K"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "What is the SI unit of electric current?",
+    "options": [
+      "Volt",
+      "Ohm",
+      "Ampere",
+      "Watt"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Which organ of the human body secretes the hormone insulin?",
+    "options": [
+      "Liver",
+      "Pancreas",
+      "Thyroid gland",
+      "Kidney"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The folk dance 'Bihu' is associated with which Indian state?",
+    "options": [
+      "Assam",
+      "Odisha",
+      "Manipur",
+      "Nagaland"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "The Nobel Prize is NOT awarded in which of the following fields?",
+    "options": [
+      "Physics",
+      "Literature",
+      "Mathematics",
+      "Chemistry"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "GENERAL_AWARENESS",
+    "text": "Which is the smallest bone in the human body?",
+    "options": [
+      "Stapes",
+      "Femur",
+      "Vomer",
+      "Radius"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "The number 1200 is first increased by 25% and the result is then decreased by 20%. What is the final number?",
+    "options": [
+      "1150",
+      "1180",
+      "1250",
+      "1200"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "A shopkeeper buys an article for ₹800 and marks it 40% above the cost price. He then sells it after allowing a discount of 15%. What is his profit percentage?",
+    "options": [
+      "17%",
+      "19%",
+      "18%",
+      "20%"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the difference between the compound interest and the simple interest on ₹8,000 for 2 years at 10% per annum, interest compounded annually?",
+    "options": [
+      "₹60",
+      "₹72",
+      "₹80",
+      "₹88"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "A can complete a piece of work in 12 days and B can complete the same work in 18 days. Working together, in how many days will they complete the work?",
+    "options": [
+      "7 1/5 days",
+      "7 1/2 days",
+      "8 days",
+      "6 2/3 days"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "Pipe A can fill a tank in 6 hours and pipe B can fill the same tank in 8 hours. If both pipes are opened together, in how much time will the tank be filled?",
+    "options": [
+      "3 1/2 hours",
+      "4 hours",
+      "3 3/7 hours",
+      "2 6/7 hours"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "A train 180 m long is running at a speed of 54 km/h. How much time will it take to cross a platform 270 m long?",
+    "options": [
+      "24 seconds",
+      "27 seconds",
+      "33 seconds",
+      "30 seconds"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "The speed of a boat in still water is 10 km/h and the speed of the stream is 2 km/h. How long will the boat take to travel 48 km downstream?",
+    "options": [
+      "3 hours",
+      "5 hours",
+      "4 hours",
+      "6 hours"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "The average of 5 numbers is 27. If one of the numbers is removed, the average of the remaining 4 numbers becomes 25. What is the number that was removed?",
+    "options": [
+      "30",
+      "35",
+      "32",
+      "37"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "If A : B = 3 : 4 and B : C = 6 : 7, then what is A : B : C?",
+    "options": [
+      "9 : 12 : 14",
+      "3 : 4 : 6",
+      "6 : 8 : 7",
+      "9 : 12 : 16"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "A invests ₹12,000 in a business for 12 months and B invests ₹18,000 for 8 months. If the total annual profit is ₹24,000, what is A's share of the profit?",
+    "options": [
+      "₹10,000",
+      "₹14,000",
+      "₹12,000",
+      "₹16,000"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "A 40-litre mixture of milk and water contains milk and water in the ratio 3 : 1. How much water must be added so that the ratio of milk to water becomes 3 : 2?",
+    "options": [
+      "8 litres",
+      "12 litres",
+      "15 litres",
+      "10 litres"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "If x + 1/x = 5, then what is the value of x² + 1/x² ?",
+    "options": [
+      "21",
+      "25",
+      "23",
+      "27"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "If a + b = 10 and ab = 21, then what is the value of a³ + b³ ?",
+    "options": [
+      "340",
+      "400",
+      "430",
+      "370"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the area of a triangle whose sides measure 13 cm, 14 cm and 15 cm?",
+    "options": [
+      "80 cm²",
+      "84 cm²",
+      "88 cm²",
+      "92 cm²"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the area of a sector of a circle of radius 7 cm with a central angle of 90°? (Take π = 22/7)",
+    "options": [
+      "35 cm²",
+      "42 cm²",
+      "38.5 cm²",
+      "49 cm²"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the curved surface area of a cylinder of radius 7 cm and height 10 cm? (Take π = 22/7)",
+    "options": [
+      "400 cm²",
+      "480 cm²",
+      "540 cm²",
+      "440 cm²"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "The volume of a cube is 1728 cm³. What is its total surface area?",
+    "options": [
+      "720 cm²",
+      "864 cm²",
+      "780 cm²",
+      "900 cm²"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "If sin θ = 3/5 and θ is an acute angle, then what is the value of tan θ ?",
+    "options": [
+      "4/3",
+      "3/4",
+      "4/5",
+      "5/3"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the value of sin²30° + cos²60° ?",
+    "options": [
+      "1/4",
+      "3/4",
+      "1",
+      "1/2"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "The angle of elevation of the top of a vertical tower from a point on the ground is 30°. If the point is 30√3 metres from the foot of the tower, what is the height of the tower?",
+    "options": [
+      "30 metres",
+      "45 metres",
+      "60 metres",
+      "90 metres"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the greatest number that divides both 200 and 320, leaving a remainder of 5 in each case?",
+    "options": [
+      "12",
+      "18",
+      "15",
+      "20"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "The HCF of two numbers is 12 and their LCM is 336. If one of the numbers is 84, what is the other number?",
+    "options": [
+      "36",
+      "56",
+      "60",
+      "48"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the compound interest on ₹10,000 at 10% per annum for 2 years, compounded annually?",
+    "options": [
+      "₹2,000",
+      "₹2,100",
+      "₹2,200",
+      "₹2,310"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "What is the value of 15% of 480 + 25% of 320 ?",
+    "options": [
+      "142",
+      "148",
+      "158",
+      "152"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "QUANTITATIVE",
+    "text": "A shopkeeper sells an article for ₹1,200 and gains 20%. What is the cost price of the article?",
+    "options": [
+      "₹960",
+      "₹1,050",
+      "₹1,000",
+      "₹1,080"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the word that is most nearly the SAME in meaning as the word 'BENEVOLENT'.",
+    "options": [
+      "Cruel",
+      "Generous",
+      "Selfish",
+      "Timid"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the word that is most nearly the SAME in meaning as the word 'ABUNDANT'.",
+    "options": [
+      "Scarce",
+      "Meagre",
+      "Plentiful",
+      "Rare"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the word that is most nearly the OPPOSITE in meaning to the word 'FRUGAL'.",
+    "options": [
+      "Thrifty",
+      "Economical",
+      "Careful",
+      "Extravagant"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the word that is most nearly the OPPOSITE in meaning to the word 'TRANSPARENT'.",
+    "options": [
+      "Opaque",
+      "Clear",
+      "Lucid",
+      "Visible"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the one word substitution for the given group of words: 'A person who cannot be corrected'.",
+    "options": [
+      "Incurable",
+      "Intolerable",
+      "Incorrigible",
+      "Invincible"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the one word substitution for the given group of words: 'A system of government by officials'.",
+    "options": [
+      "Aristocracy",
+      "Bureaucracy",
+      "Democracy",
+      "Autocracy"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the option that best expresses the meaning of the idiom: 'To let the cat out of the bag'.",
+    "options": [
+      "To create confusion",
+      "To reveal a secret",
+      "To act cruelly",
+      "To waste an opportunity"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the option that best expresses the meaning of the idiom: 'A blessing in disguise'.",
+    "options": [
+      "A hidden threat",
+      "A short-lived joy",
+      "An apparent misfortune that turns out to be beneficial",
+      "An undeserved reward"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the option that best expresses the meaning of the idiom: 'To beat about the bush'.",
+    "options": [
+      "To avoid coming to the main point",
+      "To search thoroughly",
+      "To punish severely",
+      "To work very hard"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the correctly spelt word.",
+    "options": [
+      "Accomodation",
+      "Acommodation",
+      "Accommadation",
+      "Accommodation"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the correctly spelt word from the options given below.",
+    "options": [
+      "Occurence",
+      "Occurrence",
+      "Ocurrence",
+      "Occurrance"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the part of the sentence that contains an error: 'One of my friend / is a doctor / in a government hospital. / No error'",
+    "options": [
+      "One of my friend",
+      "is a doctor",
+      "in a government hospital",
+      "No error"
+    ],
+    "answerIndex": 0
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the most appropriate option to fill in the blank: 'He has been living in this city ______ 2010.'",
+    "options": [
+      "for",
+      "from",
+      "since",
+      "by"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the most appropriate option to fill in the blank: 'She is very good ______ mathematics.'",
+    "options": [
+      "in",
+      "on",
+      "with",
+      "at"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the correct passive form of the sentence: 'The teacher punished the boy.'",
+    "options": [
+      "The boy is punished by the teacher",
+      "The boy was punished by the teacher",
+      "The boy has punished by the teacher",
+      "The boy was being punished by the teacher"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the correct indirect form of the sentence: He said, \"I am very busy today.\"",
+    "options": [
+      "He said that he is very busy today",
+      "He said that he was very busy that day",
+      "He says that he was very busy today",
+      "He told that he is very busy that day"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the option that best improves the underlined part of the sentence: 'He is senior <u>than me</u> in the office.'",
+    "options": [
+      "than mine",
+      "to me",
+      "from me",
+      "No improvement"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the most appropriate option to fill in the blank: 'Neither of the two boys ______ present in the class.'",
+    "options": [
+      "were",
+      "are",
+      "was",
+      "have"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the most appropriate option to fill in the blank: 'He was accused ______ theft by his employer.'",
+    "options": [
+      "for",
+      "of",
+      "with",
+      "by"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the word that is most nearly the SAME in meaning as the word 'METICULOUS'.",
+    "options": [
+      "Careless",
+      "Hasty",
+      "Rough",
+      "Careful"
+    ],
+    "answerIndex": 3
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the word that is most nearly the OPPOSITE in meaning to the word 'OPTIMIST'.",
+    "options": [
+      "Realist",
+      "Pessimist",
+      "Idealist",
+      "Humanist"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the one word substitution for the given group of words: 'A place where bees are kept'.",
+    "options": [
+      "Aviary",
+      "Byre",
+      "Apiary",
+      "Kennel"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the option that best expresses the meaning of the idiom: 'To burn the midnight oil'.",
+    "options": [
+      "To waste money",
+      "To study or work late into the night",
+      "To quarrel bitterly",
+      "To travel at night"
+    ],
+    "answerIndex": 1
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the most appropriate option to fill in the blank: 'If I ______ rich, I would travel around the world.'",
+    "options": [
+      "am",
+      "was",
+      "were",
+      "will be"
+    ],
+    "answerIndex": 2
+  },
+  {
+    "section": "ENGLISH",
+    "text": "Select the most appropriate option to fill in the blank: 'He is ______ university student from Delhi.'",
+    "options": [
+      "a",
+      "an",
+      "the",
+      "no article"
+    ],
+    "answerIndex": 0
+  }
+]
