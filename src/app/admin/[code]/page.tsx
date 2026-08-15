@@ -23,7 +23,6 @@ import {
 import { useRealtime } from "@/hooks/use-realtime";
 import { useCameraViewer } from "@/hooks/use-camera-viewer";
 import { api } from "@/lib/api-client";
-import { sectionShort } from "@/lib/exam";
 import type { CandidateLive, CandidateSheet, ChatLine, RoomView } from "@/lib/types";
 import type { ClientMessage } from "@/lib/realtime-protocol";
 
@@ -263,7 +262,7 @@ export default function AdminRoomPage({ params }: { params: Promise<{ code: stri
                 title="Live answer sheet"
                 meta={
                   selected
-                    ? `${selected.name} — ${sectionShort(selected.currentSection)}, question ${selected.currentIndex + 1}`
+                    ? `${selected.name} — ${selected.currentSectionName}, question ${selected.currentIndex + 1}`
                     : undefined
                 }
               />

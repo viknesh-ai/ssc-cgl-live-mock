@@ -1,43 +1,43 @@
 /**
- * Exam rules, shared by the server and the browser.
+ * Exam rules.
  *
- * SSC CGL Tier-I: 100 questions in four fixed sections of 25, each section on
- * its own clock, +2 for a correct answer and -0.5 for a wrong one.
+ * Nothing here is specific to one examination any more: a paper's shape — its
+ * sections, how many questions each holds, how long each runs and how it is
+ * marked — comes from the database as a PaperSpec, and these helpers work off
+ * that. Adding a second exam is data, not code.
  */
-import type { Section } from "@/generated/prisma/enums";
 
-export const SECTION_ORDER = [
-  "REASONING",
-  "GENERAL_AWARENESS",
-  "QUANTITATIVE",
-  "ENGLISH",
-] as const satisfies readonly Section[];
-
-export const SECTION_LABEL: Record<Section, string> = {
-  REASONING: "General Intelligence & Reasoning",
-  GENERAL_AWARENESS: "General Awareness",
-  QUANTITATIVE: "Quantitative Aptitude",
-  ENGLISH: "English Language & Comprehension",
+export type SectionSpec = {
+  /** 0-based position within the paper. */
+  index: number;
+  sectionId: number;
+  name: string;
+  shortName: string;
+  questionCount: number;
+  minutes: number;
+  /** Optional filter: draw only questions carrying this topic. */
+  topic: string | null;
+  /** Position of this section's first question in the whole paper. */
+  offset: number;
 };
 
-export const SECTION_SHORT: Record<Section, string> = {
-  REASONING: "Reasoning",
-  GENERAL_AWARENESS: "General Awareness",
-  QUANTITATIVE: "Quantitative",
-  ENGLISH: "English",
+export type PaperSpec = {
+  paperId: number;
+  paperName: string;
+  examId: number;
+  examName: string;
+  correctMark: number;
+  wrongMark: number;
+  sections: SectionSpec[];
+  totalQuestions: number;
+  maxScore: number;
+  totalMinutes: number;
 };
 
-export const QUESTIONS_PER_SECTION = 25;
-export const TOTAL_QUESTIONS = SECTION_ORDER.length * QUESTIONS_PER_SECTION;
-export const MARK_CORRECT = 2;
-export const MARK_WRONG = -0.5;
-export const MAX_SCORE = TOTAL_QUESTIONS * MARK_CORRECT;
-export const DEFAULT_SECTION_MINUTES = 15;
 export const MAX_TAB_SWITCHES = 3;
-
-export const sectionOf = (order: number) => Math.floor(order / QUESTIONS_PER_SECTION);
-export const sectionName = (index: number) => SECTION_LABEL[SECTION_ORDER[index]] ?? "—";
-export const sectionShort = (index: number) => SECTION_SHORT[SECTION_ORDER[index]] ?? "—";
+export const OPTION_LETTERS = ["A", "B", "C", "D"] as const;
+export const DEFAULT_SECTION_MINUTES = 15;
+export const DEFAULT_QUESTIONS_PER_SECTION = 25;
 
 /** Room codes are short and readable so they can be typed or read aloud. */
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -50,8 +50,9 @@ export function generateRoomCode(length = 6) {
 }
 
 export type SectionResult = {
-  section: Section;
-  label: string;
+  index: number;
+  name: string;
+  shortName: string;
   correct: number;
   wrong: number;
   skipped: number;
@@ -61,6 +62,7 @@ export type SectionResult = {
 
 export type ScoreSheet = {
   total: number;
+  maxScore: number;
   attempted: number;
   correct: number;
   wrong: number;
@@ -70,11 +72,13 @@ export type ScoreSheet = {
 };
 
 export function scoreAttempt(
-  items: { order: number; selected: number | null; answerIndex: number }[],
+  items: { sectionIndex: number; selected: number | null; answerIndex: number }[],
+  spec: Pick<PaperSpec, "sections" | "correctMark" | "wrongMark" | "maxScore">,
 ): ScoreSheet {
-  const sections: SectionResult[] = SECTION_ORDER.map((section) => ({
-    section,
-    label: SECTION_LABEL[section],
+  const sections: SectionResult[] = spec.sections.map((s) => ({
+    index: s.index,
+    name: s.name,
+    shortName: s.shortName,
     correct: 0,
     wrong: 0,
     skipped: 0,
@@ -83,7 +87,7 @@ export function scoreAttempt(
   }));
 
   for (const item of items) {
-    const row = sections[sectionOf(item.order)];
+    const row = sections[item.sectionIndex];
     if (!row) continue;
     if (item.selected === null || item.selected === undefined) row.skipped++;
     else if (item.selected === item.answerIndex) row.correct++;
@@ -92,7 +96,7 @@ export function scoreAttempt(
 
   let total = 0;
   for (const row of sections) {
-    row.score = round(row.correct * MARK_CORRECT + row.wrong * MARK_WRONG);
+    row.score = round(row.correct * spec.correctMark + row.wrong * spec.wrongMark);
     const attempted = row.correct + row.wrong;
     row.accuracy = attempted ? round((row.correct / attempted) * 100, 1) : 0;
     total += row.score;
@@ -105,6 +109,7 @@ export function scoreAttempt(
 
   return {
     total: round(total),
+    maxScore: spec.maxScore,
     attempted,
     correct,
     wrong,
@@ -142,5 +147,3 @@ export function formatClock(ms: number) {
   const s = total % 60;
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
-
-export const OPTION_LETTERS = ["A", "B", "C", "D"] as const;

@@ -5,8 +5,9 @@ camera supervision; the examiner watches progress and marks live; afterwards an
 AI explains any question the candidate wants worked through.
 
 The first paper is SSC CGL Tier-I — 100 questions in four 15-minute sections —
-but the platform is not tied to it: papers are listed in `src/lib/brand.ts` and
-more can be added alongside.
+but nothing is hardcoded to it: exams, their sections, the papers drawn from
+them and the questions themselves all live in the database and are managed from
+the examiner console.
 
 ## Stack
 
@@ -26,17 +27,28 @@ REST API, and the websocket upgrade on `/ws` is handled by the same server.
 
 ## How it works
 
-**Rooms.** The examiner creates a room and gets a six-character code
+**Exams, papers, sessions.** An *exam* owns its sections and marking scheme. A
+*paper* is a blueprint over one exam: how many questions to draw from each
+section, how long each section runs, and optionally which topic to draw from. A
+*session* runs one paper for a group of candidates and gets a six-character code
 (`KX4M2P`). Candidates enter that code, or open `/exam/KX4M2P` directly. There
 are no UUIDs anywhere in the product surface.
 
-**Papers.** On joining, a candidate is dealt 25 questions per section, preferring
-questions they have not been served before. Re-joining or reloading returns the
-same paper. The answer key never leaves the server until the paper is submitted.
+**The question bank.** Every question lives in Postgres with its section, topic,
+difficulty and draft/published state, and carries its own statistics — how often
+it has been served and what proportion of candidates got it right. Examiners
+write, edit, search and bulk-import questions in the console; a question added
+now is in the next session, with no redeploy.
 
-**The clock.** Each section runs on its own 15-minute clock, held by the server.
+**Drawing a paper.** On joining, each candidate is dealt their own set from the
+bank, preferring questions they have not been served before. Re-joining or
+reloading returns the same paper. The answer key never leaves the server until
+the paper is submitted. A session cannot be created if the bank cannot supply
+what the paper asks for.
+
+**The clock.** Each section runs on its own clock, held by the server.
 Submitting a section early opens the next one on a fresh clock — unused time
-does not carry forward. Pausing the room freezes every candidate's clock and
+does not carry forward. Pausing the session freezes every candidate's clock and
 resuming credits the frozen time back.
 
 **Invigilation.** The candidate's camera opens when the exam does. When the
@@ -125,9 +137,10 @@ npm run dev                   # http://localhost:3000
 `npm run dev` runs the same custom server as production, so websockets, camera
 signalling and chat all work locally.
 
-## Editing the question bank
+## Seeding questions from a file
 
-Questions live in `prisma/questions.json`:
+The console is the normal way to manage questions. `prisma/questions.json` seeds
+the starting bank on first deploy and tops up anything missing afterwards:
 
 ```json
 {
@@ -138,14 +151,13 @@ Questions live in `prisma/questions.json`:
 }
 ```
 
-`section` is one of `REASONING`, `GENERAL_AWARENESS`, `QUANTITATIVE`, `ENGLISH`;
-`answerIndex` is 0-based. Each section needs at least 25 questions. Run
+`section` names a section of the seeded exam; `answerIndex` is 0-based. Run
 `npm run db:seed` (or redeploy) to load changes. Questions are matched on their
-exact text, so editing the text of an existing question adds a new one — change
-the options or the answer instead when you mean to correct a question.
+exact text, so editing text in the file adds a new question rather than changing
+the old one — use the console to correct a question that already exists.
 
-Adding more than 25 per section is worthwhile: papers prefer questions a
-candidate has not seen before, so a larger bank means repeat attempts stay
+A bank larger than a paper needs is worthwhile: papers prefer questions a
+candidate has not seen before, so more questions mean repeat attempts stay
 fresh.
 
 ## Project layout
@@ -161,13 +173,27 @@ src/lib/                   Exam rules, scoring, auth, EURI client
 src/server/                Websocket server and connection registry
 ```
 
-## Adding another paper
+## The examiner console
 
-`src/lib/brand.ts` holds the paper list shown to candidates, and `APP_NAME` —
-change it there and the name changes throughout. The exam engine itself is
-driven by `src/lib/exam.ts` (sections, questions per section, marking), so a
-paper with a different shape means changing those constants and the `Section`
-enum in the Prisma schema.
+`/admin`, behind the shared examiner login:
+
+- **Sessions** — create a session from a paper, share its code, and invigilate:
+  live candidate table, answer sheet marked as they work, camera, chat, and
+  start/pause/end controls.
+- **Papers** — create and edit blueprints. Each section gets its own question
+  count, duration and optional topic filter, and the page shows how many
+  published questions the bank actually holds for it.
+- **Question bank** — filter by section, topic, difficulty, status or text;
+  write and edit questions; bulk import by pasting JSON; see how each question
+  has performed. Questions that have already been served are retired to drafts
+  rather than deleted, so past results keep their questions.
+
+## Adding another exam
+
+Exams are rows, not code. Insert an `Exam` with its `ExamSection`s (or extend
+`prisma/seed.ts`), add questions to the bank against those sections, then create
+a paper over them. `APP_NAME` in `src/lib/brand.ts` is the only naming constant
+left in the source.
 
 ## Notes
 

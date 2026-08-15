@@ -1,5 +1,5 @@
 import { requireUser, route } from "@/lib/auth-server";
-import { joinRoom, toAttemptState } from "@/lib/attempt";
+import { joinRoom, specOf, toAttemptState } from "@/lib/attempt";
 import { hub } from "@/server/hub";
 
 export const dynamic = "force-dynamic";
@@ -13,5 +13,5 @@ export const POST = route(async (req: Request, ctx: { params: Promise<{ code: st
   const user = await requireUser(req);
   const attempt = await joinRoom(user.id, code.toUpperCase());
   if (attempt.roomId) await hub.publishRoom(attempt.roomId);
-  return Response.json({ state: toAttemptState(attempt) });
+  return Response.json({ state: toAttemptState(attempt, await specOf(attempt)) });
 });

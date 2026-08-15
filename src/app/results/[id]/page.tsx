@@ -7,7 +7,6 @@ import { AppHeader } from "@/components/app-header";
 import { ReviewList } from "@/components/results/review-list";
 import { Button, Notice, Panel, PanelHeader, Spinner, Stat, StatRow } from "@/components/ui";
 import { api } from "@/lib/api-client";
-import { MAX_SCORE, SECTION_SHORT, TOTAL_QUESTIONS } from "@/lib/exam";
 import type { AttemptResult } from "@/lib/types";
 
 type Payload = {
@@ -31,11 +30,10 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
 
   const score = data?.result.score;
 
-  const verdict = useMemo(() => {
-    if (!score) return null;
-    const weakest = [...score.sections].sort((a, b) => a.score - b.score)[0];
-    return weakest;
-  }, [score]);
+  const verdict = useMemo(
+    () => (score ? [...score.sections].sort((a, b) => a.score - b.score)[0] : null),
+    [score],
+  );
 
   if (!ready || (session && !data && !error)) {
     return (
@@ -74,7 +72,7 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="min-h-full">
-      <AppHeader subtitle={`Result for ${data.candidateName}`} />
+      <AppHeader subtitle={`${data.result.paperName} · ${data.candidateName}`} />
 
       <main className="mx-auto max-w-6xl space-y-5 px-5 py-8">
         <div>
@@ -96,11 +94,14 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
               value={
                 <>
                   {score.total.toFixed(1)}
-                  <span className="text-sm font-normal text-ink-3"> / {MAX_SCORE}</span>
+                  <span className="text-sm font-normal text-ink-3"> / {score.maxScore}</span>
                 </>
               }
             />
-            <Stat label="Attempted" value={`${score.attempted} / ${TOTAL_QUESTIONS}`} />
+            <Stat
+              label="Attempted"
+              value={`${score.attempted} / ${data.result.questions.length}`}
+            />
             <Stat label="Correct" value={score.correct} tone="ok" />
             <Stat label="Wrong" value={score.wrong} tone="bad" />
           </StatRow>
@@ -124,10 +125,8 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
               </thead>
               <tbody>
                 {score.sections.map((row) => (
-                  <tr key={row.section} className="border-b border-line last:border-0">
-                    <td className="px-5 py-2.5 font-medium text-ink">
-                      {SECTION_SHORT[row.section]}
-                    </td>
+                  <tr key={row.index} className="border-b border-line last:border-0">
+                    <td className="px-5 py-2.5 font-medium text-ink">{row.shortName}</td>
                     <td className="tabular px-4 py-2.5 text-right text-ok">{row.correct}</td>
                     <td className="tabular px-4 py-2.5 text-right text-bad">{row.wrong}</td>
                     <td className="tabular px-4 py-2.5 text-right text-ink-2">{row.skipped}</td>
@@ -144,7 +143,7 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
 
         {verdict ? (
           <Notice>
-            Weakest section: <strong className="text-ink">{SECTION_SHORT[verdict.section]}</strong> —{" "}
+            Weakest section: <strong className="text-ink">{verdict.shortName}</strong> —{" "}
             {verdict.correct} correct, {verdict.wrong} wrong, {verdict.skipped} skipped. Use the AI
             explanations below on the ones you got wrong there first.
           </Notice>

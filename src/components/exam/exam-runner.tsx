@@ -20,14 +20,7 @@ import {
 import { useRealtime } from "@/hooks/use-realtime";
 import { useCameraPublisher } from "@/hooks/use-camera-publisher";
 import { api } from "@/lib/api-client";
-import {
-  MAX_TAB_SWITCHES,
-  OPTION_LETTERS,
-  QUESTIONS_PER_SECTION,
-  SECTION_ORDER,
-  sectionName,
-  sectionShort,
-} from "@/lib/exam";
+import { MAX_TAB_SWITCHES, OPTION_LETTERS } from "@/lib/exam";
 import type { AttemptState, ChatLine } from "@/lib/types";
 import type { ClientMessage } from "@/lib/realtime-protocol";
 
@@ -127,12 +120,9 @@ export function ExamRunner({
   }, [live, state.status]);
 
   /* -------------------------------- answering ------------------------------- */
+  const section = state.paper.sections[state.currentSection];
   const sectionQuestions = useMemo(
-    () =>
-      state.questions.slice(
-        state.currentSection * QUESTIONS_PER_SECTION,
-        (state.currentSection + 1) * QUESTIONS_PER_SECTION,
-      ),
+    () => state.questions.filter((q) => q.sectionIndex === state.currentSection),
     [state.questions, state.currentSection],
   );
 
@@ -170,7 +160,7 @@ export function ExamRunner({
 
   const goTo = useCallback(
     (next: number) => {
-      const clamped = Math.min(QUESTIONS_PER_SECTION - 1, Math.max(0, next));
+      const clamped = Math.min(sectionQuestions.length - 1, Math.max(0, next));
       setIndex(clamped);
       const target = sectionQuestions[clamped];
       if (target) void patch({ order: target.order, currentIndex: clamped });
@@ -237,8 +227,8 @@ export function ExamRunner({
   }
 
   const answeredInSection = sectionQuestions.filter((q) => q.selected !== null).length;
-  const isFinalSection = state.currentSection >= SECTION_ORDER.length - 1;
-  const unanswered = QUESTIONS_PER_SECTION - answeredInSection;
+  const isFinalSection = state.currentSection >= state.paper.sections.length - 1;
+  const unanswered = sectionQuestions.length - answeredInSection;
 
   return (
     <div className="min-h-full">
@@ -250,7 +240,7 @@ export function ExamRunner({
         }
       />
 
-      <SectionStepper current={state.currentSection} />
+      <SectionStepper sections={state.paper.sections} current={state.currentSection} />
 
       <main className="mx-auto grid max-w-7xl gap-5 px-5 py-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-4">
@@ -274,11 +264,13 @@ export function ExamRunner({
             <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
               <div className="text-[13px] font-medium text-ink-2">
                 Question <span className="tabular text-ink">{index + 1}</span> of{" "}
-                {QUESTIONS_PER_SECTION}
+                {sectionQuestions.length}
               </div>
               <div className="flex items-center gap-2">
                 {question?.marked ? <Badge tone="warn">Marked for review</Badge> : null}
-                <span className="text-[12px] text-ink-3">+2 correct &middot; &minus;0.5 wrong</span>
+                <span className="text-[12px] text-ink-3">
+                  +{state.paper.correctMark} correct &middot; {state.paper.wrongMark} wrong
+                </span>
               </div>
             </div>
 
@@ -347,7 +339,7 @@ export function ExamRunner({
                 <Button
                   size="sm"
                   variant="primary"
-                  disabled={index >= QUESTIONS_PER_SECTION - 1}
+                  disabled={index >= sectionQuestions.length - 1}
                   onClick={() => goTo(index + 1)}
                 >
                   Next
@@ -368,7 +360,7 @@ export function ExamRunner({
           <Panel>
             <PanelHeader
               title="Questions"
-              meta={`${answeredInSection} of ${QUESTIONS_PER_SECTION} answered`}
+              meta={`${answeredInSection} of ${sectionQuestions.length} answered`}
             />
             <div className="px-4 py-4">
               <QuestionPalette questions={sectionQuestions} currentIndex={index} onJump={goTo} />
@@ -408,7 +400,7 @@ export function ExamRunner({
 
       <ConfirmDialog
         open={confirming === "section"}
-        title={`Submit ${sectionName(state.currentSection)}?`}
+        title={`Submit ${section?.name ?? "this section"}?`}
         body={
           <>
             The next section starts on a fresh {state.sectionMinutes}-minute clock and you cannot
@@ -454,17 +446,23 @@ export function ExamRunner({
   );
 }
 
-/** Where the candidate is in the paper — four steps, no decoration. */
-function SectionStepper({ current }: { current: number }) {
+/** Where the candidate is in the paper — one step per section, no decoration. */
+function SectionStepper({
+  sections,
+  current,
+}: {
+  sections: AttemptState["paper"]["sections"];
+  current: number;
+}) {
   return (
     <div className="border-b border-line bg-surface">
       <div className="mx-auto flex max-w-7xl gap-6 overflow-x-auto px-5">
-        {SECTION_ORDER.map((_, i) => {
+        {sections.map((section, i) => {
           const done = i < current;
           const active = i === current;
           return (
             <div
-              key={i}
+              key={section.index}
               className={cx(
                 "flex shrink-0 items-center gap-2 border-b-2 py-2.5 text-[13px]",
                 active ? "border-ink font-medium text-ink" : "border-transparent text-ink-3",
@@ -472,7 +470,7 @@ function SectionStepper({ current }: { current: number }) {
             >
               <span className="tabular text-[11px] font-semibold text-ink-3">{i + 1}</span>
               <span className={done ? "line-through decoration-ink-3/60" : undefined}>
-                {sectionShort(i)}
+                {section.shortName}
               </span>
               {done ? <span className="text-[11px] text-ink-3">closed</span> : null}
             </div>

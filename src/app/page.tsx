@@ -9,8 +9,21 @@ import { GoogleMark } from "@/components/google-mark";
 import { Wordmark } from "@/components/wordmark";
 import { Button, EmptyState, Input, Notice, Panel, PanelHeader, Spinner } from "@/components/ui";
 import { api, ApiError } from "@/lib/api-client";
-import { APP_NAME, APP_TAGLINE, PAPERS } from "@/lib/brand";
-import { MAX_SCORE } from "@/lib/exam";
+import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
+
+type CataloguePaper = {
+  id: number;
+  name: string;
+  description: string | null;
+  examName: string;
+  examDescription: string | null;
+  correctMark: number;
+  wrongMark: number;
+  questions: number;
+  minutes: number;
+  maxScore: number;
+  sections: { name: string; shortName: string; questionCount: number; minutes: number }[];
+};
 
 type AttemptRow = {
   id: number;
@@ -22,6 +35,18 @@ type AttemptRow = {
   roomCode: string | null;
   roomTitle: string | null;
 };
+
+/** The papers on offer, straight from the database rather than hardcoded. */
+function useCatalogue() {
+  const [papers, setPapers] = useState<CataloguePaper[] | null>(null);
+  useEffect(() => {
+    fetch("/api/catalogue")
+      .then((r) => r.json())
+      .then((d) => setPapers(d.papers ?? []))
+      .catch(() => setPapers([]));
+  }, []);
+  return papers;
+}
 
 export default function HomePage() {
   const { ready, session } = useAuth();
@@ -51,7 +76,8 @@ export default function HomePage() {
 function Landing() {
   const { signIn, configured, error } = useAuth();
   const [busy, setBusy] = useState(false);
-  const paper = PAPERS[0];
+  const papers = useCatalogue();
+  const paper = papers?.[0];
 
   return (
     <div className="min-h-full">
@@ -123,28 +149,46 @@ function Landing() {
 
         {/* The paper, written out the way a notice board would put it. */}
         <aside className="lg:pt-10">
-          <div className="border-t-2 border-ink pt-4">
-            <p className="eyebrow">Available paper</p>
-            <h2 className="mt-1.5 font-display text-xl tracking-tight text-ink">{paper.name}</h2>
-            <p className="mt-1 text-[13px] leading-relaxed text-ink-2">{paper.summary}</p>
+          {paper ? (
+            <div className="border-t-2 border-ink pt-4">
+              <p className="eyebrow">
+                {papers && papers.length > 1 ? "Papers on offer" : "Available paper"}
+              </p>
+              <h2 className="mt-1.5 font-display text-xl tracking-tight text-ink">
+                {paper.examName}
+              </h2>
+              <p className="mt-1 text-[13px] leading-relaxed text-ink-2">
+                {paper.examDescription ?? paper.description}
+              </p>
 
-            <dl className="mt-5 divide-y divide-line border-y border-line text-[13.5px]">
-              {[
-                ["Questions", `${paper.questions}`],
-                ["Sections", paper.sections.join(", ")],
-                ["Duration", `4 × 15 minutes`],
-                ["Marks", `+2 correct, −0.5 wrong, ${paper.marks} total`],
-                ["Invigilation", "Camera and microphone, live"],
-                ["After the paper", "Marked instantly, AI answer review"],
-              ].map(([label, value]) => (
-                <div key={label} className="flex gap-4 py-2.5">
-                  <dt className="w-32 shrink-0 text-ink-3">{label}</dt>
-                  <dd className="text-ink">{value}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="mt-4 text-[12px] text-ink-3">More papers are being added.</p>
-          </div>
+              <dl className="mt-5 divide-y divide-line border-y border-line text-[13.5px]">
+                {[
+                  ["Questions", String(paper.questions)],
+                  ["Sections", paper.sections.map((s) => s.shortName).join(", ")],
+                  [
+                    "Duration",
+                    `${paper.sections.length} × ${paper.sections[0]?.minutes ?? 0} minutes`,
+                  ],
+                  [
+                    "Marks",
+                    `+${paper.correctMark} correct, ${paper.wrongMark} wrong, ${paper.maxScore} total`,
+                  ],
+                  ["Invigilation", "Camera and microphone, live"],
+                  ["After the paper", "Marked instantly, AI answer review"],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex gap-4 py-2.5">
+                    <dt className="w-32 shrink-0 text-ink-3">{label}</dt>
+                    <dd className="text-ink">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-4 text-[12px] text-ink-3">
+                {papers && papers.length > 1
+                  ? `${papers.length} papers available once you sign in.`
+                  : "More papers are being added."}
+              </p>
+            </div>
+          ) : null}
         </aside>
       </main>
     </div>
@@ -158,7 +202,7 @@ function ExaminerHome() {
     <div className="max-w-2xl">
       <h1 className="font-display text-3xl tracking-tight text-ink">Examiner</h1>
       <p className="mt-2 text-[14px] text-ink-2">
-        Create a room, share its code, and invigilate candidates as they write.
+        Create a session, share its code, and invigilate candidates as they write.
       </p>
       <div className="mt-6">
         <Link href="/admin">
@@ -175,9 +219,9 @@ function CandidateHome() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [joinError, setJoinError] = useState<string | null>(null);
-  const [busy, setBusy] = useState<"join" | "practice" | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
   const [attempts, setAttempts] = useState<AttemptRow[] | null>(null);
-  const paper = PAPERS[0];
+  const papers = useCatalogue();
 
   useEffect(() => {
     api<{ attempts: AttemptRow[] }>("/api/attempts")
@@ -199,11 +243,12 @@ function CandidateHome() {
     }
   };
 
-  const practice = async () => {
-    setBusy("practice");
+  const practice = async (paperId: number) => {
+    setBusy(`paper-${paperId}`);
     try {
       const { state } = await api<{ state: { attemptId: number } }>("/api/practice", {
         method: "POST",
+        body: { paperId },
       });
       router.push(`/practice/${state.attemptId}`);
     } catch (err) {
@@ -217,35 +262,48 @@ function CandidateHome() {
       <div>
         <h1 className="font-display text-3xl tracking-tight text-ink">Take a paper</h1>
         <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-ink-2">
-          Join the room your examiner gave you, or write a paper on your own.
+          Join the session your examiner gave you, or write a paper on your own.
         </p>
 
-        {/* One entry today; the list is where further papers will appear. */}
         <div className="mt-7 border-t-2 border-ink">
-          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-line py-5">
-            <div className="min-w-0 max-w-md">
-              <h2 className="font-display text-lg tracking-tight text-ink">{paper.name}</h2>
-              <p className="mt-1 text-[13px] leading-relaxed text-ink-2">{paper.summary}</p>
-              <p className="mt-2 text-[12.5px] text-ink-3">
-                {paper.questions} questions · 4 × 15 minutes · {paper.marks} marks · +2 / −0.5
-              </p>
+          {papers === null ? (
+            <div className="flex justify-center py-10">
+              <Spinner />
             </div>
-            <Button disabled={busy !== null} onClick={practice}>
-              {busy === "practice" ? <Spinner /> : null}
-              Practice on my own
-            </Button>
-          </div>
+          ) : papers.length === 0 ? (
+            <p className="py-6 text-[13px] text-ink-2">No papers are available yet.</p>
+          ) : (
+            papers.map((paper) => (
+              <div
+                key={paper.id}
+                className="flex flex-wrap items-start justify-between gap-4 border-b border-line py-5"
+              >
+                <div className="min-w-0 max-w-md">
+                  <h2 className="font-display text-lg tracking-tight text-ink">{paper.examName}</h2>
+                  <p className="mt-0.5 text-[13px] text-ink-2">{paper.name}</p>
+                  <p className="mt-2 text-[12.5px] text-ink-3">
+                    {paper.questions} questions · {paper.minutes} minutes · {paper.maxScore} marks ·
+                    +{paper.correctMark} / {paper.wrongMark}
+                  </p>
+                </div>
+                <Button disabled={busy !== null} onClick={() => practice(paper.id)}>
+                  {busy === `paper-${paper.id}` ? <Spinner /> : null}
+                  Practice on my own
+                </Button>
+              </div>
+            ))
+          )}
         </div>
 
         <Panel className="mt-7">
           <PanelHeader
-            title="Join a live room"
+            title="Join a live session"
             meta="Invigilated: your camera stays with the examiner for the whole paper."
           />
           <div className="px-5 py-4">
             <div className="flex flex-wrap items-end gap-3">
               <label className="min-w-45 flex-1">
-                <span className="eyebrow">Room code</span>
+                <span className="eyebrow block">Room code</span>
                 <Input
                   value={code}
                   autoCapitalize="characters"
@@ -259,7 +317,7 @@ function CandidateHome() {
               </label>
               <Button variant="primary" disabled={busy !== null || !code.trim()} onClick={join}>
                 {busy === "join" ? <Spinner /> : null}
-                Join room
+                Join session
               </Button>
             </div>
             {joinError ? (
@@ -301,7 +359,7 @@ function CandidateHome() {
                     href={`/results/${a.id}`}
                     className="tabular shrink-0 text-[13px] font-medium text-accent hover:underline"
                   >
-                    {a.totalScore?.toFixed(1)} / {MAX_SCORE}
+                    {a.totalScore?.toFixed(1)} marks
                   </Link>
                 ) : (
                   <Link

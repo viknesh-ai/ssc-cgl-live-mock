@@ -1,24 +1,41 @@
-/** Exam rooms: creation, the examiner's start/pause/end controls, and listing. */
+/** Exam sessions: creation, the examiner's start/pause/end controls, and listing. */
 import { prisma } from "@/lib/prisma";
 import { HttpError } from "@/lib/auth-server";
-import { DEFAULT_SECTION_MINUTES, generateRoomCode } from "@/lib/exam";
-import { DEFAULT_PAPER } from "@/lib/brand";
+import { generateRoomCode } from "@/lib/exam";
+import { assertDrawable, getPaperSpec } from "@/lib/paper";
 import { getAttempt, submitAttempt, syncClock } from "@/lib/attempt";
 import type { RoomView } from "@/lib/types";
-import type { Room, User } from "@/generated/prisma/client";
+import type { Prisma, Room, User } from "@/generated/prisma/client";
 
-export async function createRoom(examiner: User, title?: string): Promise<Room> {
+const roomInclude = {
+  examiner: true,
+  paper: { include: { exam: true } },
+  _count: { select: { attempts: true } },
+} satisfies Prisma.RoomInclude;
+
+export type FullRoom = Prisma.RoomGetPayload<{ include: typeof roomInclude }>;
+
+export async function createRoom(
+  examiner: User,
+  paperId: number,
+  title?: string,
+): Promise<FullRoom> {
+  const paper = await prisma.paper.findUnique({ where: { id: paperId } });
+  if (!paper) throw new HttpError(404, "That paper does not exist.");
+  // Fails early if the paper cannot actually be drawn, rather than at exam time.
+  await assertDrawable(await getPaperSpec(paperId));
+
   for (let tries = 0; tries < 8; tries++) {
     const code = generateRoomCode();
-    const clash = await prisma.room.findUnique({ where: { code } });
-    if (clash) continue;
+    if (await prisma.room.findUnique({ where: { code } })) continue;
     return prisma.room.create({
       data: {
         code,
-        title: title?.trim() || `${DEFAULT_PAPER.name} mock`,
+        title: title?.trim() || paper.name,
+        paperId,
         examinerId: examiner.id,
-        sectionMinutes: DEFAULT_SECTION_MINUTES,
       },
+      include: roomInclude,
     });
   }
   throw new HttpError(500, "Could not allocate a room code. Try again.");
@@ -30,6 +47,10 @@ export async function requireRoom(code: string): Promise<Room> {
   return room;
 }
 
+export function fullRoom(id: number) {
+  return prisma.room.findUniqueOrThrow({ where: { id }, include: roomInclude });
+}
+
 export type RoomControl = "start" | "pause" | "resume" | "end";
 
 export async function controlRoom(room: Room, action: RoomControl): Promise<Room> {
@@ -39,6 +60,7 @@ export async function controlRoom(room: Room, action: RoomControl): Promise<Room
     case "start": {
       if (room.status === "ENDED") throw new HttpError(409, "This exam has already ended.");
       if (room.status === "RUNNING") return room;
+      const spec = await getPaperSpec(room.paperId);
       // Everyone waiting in the room starts their first section together.
       await prisma.attempt.updateMany({
         where: { roomId: room.id, status: "WAITING" },
@@ -46,6 +68,7 @@ export async function controlRoom(room: Room, action: RoomControl): Promise<Room
           status: "IN_PROGRESS",
           currentSection: 0,
           currentIndex: 0,
+          sectionMinutes: spec.sections[0].minutes,
           sectionStartedAt: now,
           pausedMs: 0,
         },
@@ -97,24 +120,27 @@ export async function controlRoom(room: Room, action: RoomControl): Promise<Room
   }
 }
 
-export async function listRooms(examinerId: number): Promise<RoomView[]> {
+/**
+ * Sessions are shared: examiners use one login, so the list is not scoped to
+ * whoever happens to be signed in.
+ */
+export async function listRooms(): Promise<RoomView[]> {
   const rooms = await prisma.room.findMany({
-    where: { examinerId },
     orderBy: { createdAt: "desc" },
     take: 50,
-    include: { examiner: true, _count: { select: { attempts: true } } },
+    include: roomInclude,
   });
   return rooms.map(toRoomView);
 }
 
-export function toRoomView(
-  room: Room & { examiner: { name: string }; _count: { attempts: number } },
-): RoomView {
+export function toRoomView(room: FullRoom): RoomView {
   return {
     code: room.code,
     title: room.title,
     status: room.status,
-    sectionMinutes: room.sectionMinutes,
+    paperId: room.paperId,
+    paperName: room.paper.name,
+    examName: room.paper.exam.name,
     startedAt: room.startedAt?.toISOString() ?? null,
     endedAt: room.endedAt?.toISOString() ?? null,
     createdAt: room.createdAt.toISOString(),

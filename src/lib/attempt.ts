@@ -3,17 +3,13 @@
  *
  * The server owns the clock and the answer key. A candidate's browser can only
  * report what was picked; when a section ends, who is in which section, and
- * whether an answer was right are all decided here.
+ * whether an answer was right are all decided here. The paper's shape comes
+ * from its PaperSpec, so nothing below assumes four sections of twenty-five.
  */
 import { prisma } from "@/lib/prisma";
 import { HttpError } from "@/lib/auth-server";
-import {
-  QUESTIONS_PER_SECTION,
-  SECTION_ORDER,
-  scoreAttempt,
-  sectionDeadline,
-  sectionOf,
-} from "@/lib/exam";
+import { scoreAttempt, sectionDeadline, type PaperSpec, type SectionSpec } from "@/lib/exam";
+import { getPaperSpec } from "@/lib/paper";
 import type { AttemptResult, AttemptState, CandidateLive, CandidateSheet } from "@/lib/types";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -29,33 +25,46 @@ export function getAttempt(id: number) {
   return prisma.attempt.findUnique({ where: { id }, include: attemptInclude });
 }
 
+export const specOf = (attempt: FullAttempt) => getPaperSpec(attempt.paperId);
+
 /**
- * Picks a fresh paper: 25 questions per section, preferring ones this
- * candidate has not seen before, falling back to the whole pool once the bank
- * has been exhausted.
+ * Picks a fresh paper: the questions each section asks for, preferring ones
+ * this candidate has not seen before and falling back to the whole pool once
+ * the bank has been exhausted.
  */
-async function drawPaper(userId: number): Promise<number[]> {
+async function drawQuestions(userId: number, spec: PaperSpec) {
   const seen = await prisma.seenQuestion.findMany({
     where: { userId },
     select: { questionId: true },
   });
   const seenIds = new Set(seen.map((s) => s.questionId));
-  const picked: number[] = [];
+  const drawn: { questionId: number; order: number; sectionIndex: number }[] = [];
 
-  for (const section of SECTION_ORDER) {
-    const pool = await prisma.question.findMany({ where: { section }, select: { id: true } });
-    if (pool.length < QUESTIONS_PER_SECTION) {
+  for (const section of spec.sections) {
+    const pool = await prisma.question.findMany({
+      where: {
+        sectionId: section.sectionId,
+        status: "PUBLISHED",
+        ...(section.topic ? { topic: section.topic } : {}),
+      },
+      select: { id: true },
+    });
+    if (pool.length < section.questionCount) {
       throw new HttpError(
         503,
-        `The question bank has only ${pool.length} ${section} questions; ${QUESTIONS_PER_SECTION} are needed. Run the seed script.`,
+        `"${section.name}" needs ${section.questionCount} published questions but the bank has ${pool.length}.`,
       );
     }
     let fresh = pool.filter((q) => !seenIds.has(q.id));
-    if (fresh.length < QUESTIONS_PER_SECTION) fresh = pool;
-    picked.push(...shuffle(fresh).slice(0, QUESTIONS_PER_SECTION).map((q) => q.id));
+    if (fresh.length < section.questionCount) fresh = pool;
+    shuffle(fresh)
+      .slice(0, section.questionCount)
+      .forEach((q, i) =>
+        drawn.push({ questionId: q.id, order: section.offset + i, sectionIndex: section.index }),
+      );
   }
 
-  return picked;
+  return drawn;
 }
 
 function shuffle<T>(input: T[]): T[] {
@@ -82,27 +91,27 @@ export async function joinRoom(userId: number, roomCode: string): Promise<FullAt
   });
   if (existing) return syncClock(existing);
 
-  const questionIds = await drawPaper(userId);
+  const spec = await getPaperSpec(room.paperId);
+  const running = room.status === "RUNNING" || room.status === "PAUSED";
   const created = await prisma.attempt.create({
     data: {
       userId,
       roomId: room.id,
+      paperId: room.paperId,
       mode: "LIVE",
-      sectionMinutes: room.sectionMinutes,
-      status: room.status === "RUNNING" || room.status === "PAUSED" ? "IN_PROGRESS" : "WAITING",
-      sectionStartedAt: room.status === "RUNNING" || room.status === "PAUSED" ? new Date() : null,
-      items: {
-        create: questionIds.map((questionId, order) => ({ questionId, order })),
-      },
+      sectionMinutes: spec.sections[0].minutes,
+      status: running ? "IN_PROGRESS" : "WAITING",
+      sectionStartedAt: running ? new Date() : null,
+      items: { create: await drawQuestions(userId, spec) },
     },
     include: attemptInclude,
   });
-  await recordSeen(userId, questionIds);
+  await recordSeen(userId, created.items.map((i) => i.questionId));
   return created;
 }
 
 /** Solo practice: no room, no examiner, clock starts immediately. */
-export async function startSoloAttempt(userId: number): Promise<FullAttempt> {
+export async function startSoloAttempt(userId: number, paperId: number): Promise<FullAttempt> {
   const open = await prisma.attempt.findFirst({
     where: { userId, roomId: null, status: { not: "SUBMITTED" } },
     include: attemptInclude,
@@ -110,18 +119,20 @@ export async function startSoloAttempt(userId: number): Promise<FullAttempt> {
   });
   if (open) return syncClock(open);
 
-  const questionIds = await drawPaper(userId);
+  const spec = await getPaperSpec(paperId);
   const created = await prisma.attempt.create({
     data: {
       userId,
+      paperId,
       mode: "SOLO",
       status: "IN_PROGRESS",
+      sectionMinutes: spec.sections[0].minutes,
       sectionStartedAt: new Date(),
-      items: { create: questionIds.map((questionId, order) => ({ questionId, order })) },
+      items: { create: await drawQuestions(userId, spec) },
     },
     include: attemptInclude,
   });
-  await recordSeen(userId, questionIds);
+  await recordSeen(userId, created.items.map((i) => i.questionId));
   return created;
 }
 
@@ -139,6 +150,7 @@ async function recordSeen(userId: number, questionIds: number[]) {
  */
 export async function syncClock(attempt: FullAttempt): Promise<FullAttempt> {
   if (attempt.status !== "IN_PROGRESS" || !attempt.sectionStartedAt) return attempt;
+  const spec = await specOf(attempt);
 
   // While the examiner has the room paused, time simply stops advancing.
   const paused = attempt.room?.status === "PAUSED" && attempt.room.pausedAt;
@@ -149,14 +161,15 @@ export async function syncClock(attempt: FullAttempt): Promise<FullAttempt> {
     const deadline = sectionDeadline(current);
     if (deadline === null || now < deadline) break;
 
-    if (current.currentSection >= SECTION_ORDER.length - 1) {
-      return submitAttempt(current, new Date(deadline));
-    }
+    const next = spec.sections[current.currentSection + 1];
+    if (!next) return submitAttempt(current, new Date(deadline));
+
     current = await prisma.attempt.update({
       where: { id: current.id },
       data: {
-        currentSection: current.currentSection + 1,
+        currentSection: next.index,
         currentIndex: 0,
+        sectionMinutes: next.minutes,
         // Anchor to the deadline, not to now, so sections do not drift.
         sectionStartedAt: new Date(deadline),
         pausedMs: 0,
@@ -170,13 +183,16 @@ export async function syncClock(attempt: FullAttempt): Promise<FullAttempt> {
 /** Early submit: closes the current section and opens the next on a fresh clock. */
 export async function advanceSection(attempt: FullAttempt): Promise<FullAttempt> {
   if (attempt.status !== "IN_PROGRESS") throw new HttpError(409, "This paper is not in progress.");
-  if (attempt.currentSection >= SECTION_ORDER.length - 1) return submitAttempt(attempt);
+  const spec = await specOf(attempt);
+  const next = spec.sections[attempt.currentSection + 1];
+  if (!next) return submitAttempt(attempt);
 
   return prisma.attempt.update({
     where: { id: attempt.id },
     data: {
-      currentSection: attempt.currentSection + 1,
+      currentSection: next.index,
       currentIndex: 0,
+      sectionMinutes: next.minutes,
       sectionStartedAt: new Date(),
       pausedMs: 0,
     },
@@ -186,12 +202,14 @@ export async function advanceSection(attempt: FullAttempt): Promise<FullAttempt>
 
 export async function submitAttempt(attempt: FullAttempt, at = new Date()): Promise<FullAttempt> {
   if (attempt.status === "SUBMITTED") return attempt;
+  const spec = await specOf(attempt);
   const sheet = scoreAttempt(
     attempt.items.map((item) => ({
-      order: item.order,
+      sectionIndex: item.sectionIndex,
       selected: item.selected,
       answerIndex: item.question.answerIndex,
     })),
+    spec,
   );
   return prisma.attempt.update({
     where: { id: attempt.id },
@@ -206,14 +224,15 @@ export async function saveAnswer(
   input: { order: number; selected?: number | null; marked?: boolean; currentIndex?: number },
 ): Promise<FullAttempt> {
   if (attempt.status !== "IN_PROGRESS") throw new HttpError(409, "This paper is closed.");
+  const spec = await specOf(attempt);
+  const section = spec.sections[attempt.currentSection];
 
   const item = attempt.items.find((i) => i.order === input.order);
   if (!item) throw new HttpError(404, "No such question on this paper.");
-  if (sectionOf(item.order) !== attempt.currentSection) {
-    throw new HttpError(409, "That section is locked.");
-  }
+  if (item.sectionIndex !== attempt.currentSection) throw new HttpError(409, "That section is locked.");
   if (input.selected !== undefined && input.selected !== null) {
-    if (!Number.isInteger(input.selected) || input.selected < 0 || input.selected > 3) {
+    const options = item.question.options.length;
+    if (!Number.isInteger(input.selected) || input.selected < 0 || input.selected >= options) {
       throw new HttpError(400, "Invalid option.");
     }
   }
@@ -228,35 +247,28 @@ export async function saveAnswer(
     await prisma.attemptQuestion.update({ where: { id: item.id }, data });
   }
 
-  const index =
-    input.currentIndex ?? item.order - attempt.currentSection * QUESTIONS_PER_SECTION;
+  const index = input.currentIndex ?? item.order - section.offset;
   return prisma.attempt.update({
     where: { id: attempt.id },
-    data: { currentIndex: clampIndex(index) },
+    data: { currentIndex: clampIndex(index, section) },
     include: attemptInclude,
   });
 }
 
-export async function setCurrentIndex(attempt: FullAttempt, index: number): Promise<FullAttempt> {
-  return prisma.attempt.update({
-    where: { id: attempt.id },
-    data: { currentIndex: clampIndex(index) },
-    include: attemptInclude,
-  });
-}
-
-const clampIndex = (n: number) => Math.min(QUESTIONS_PER_SECTION - 1, Math.max(0, Math.trunc(n)));
+const clampIndex = (n: number, section: SectionSpec) =>
+  Math.min(section.questionCount - 1, Math.max(0, Math.trunc(n)));
 
 /* --------------------------------- views --------------------------------- */
 
 /** What the candidate is allowed to see: no answer key until they submit. */
-export function toAttemptState(attempt: FullAttempt): AttemptState {
+export function toAttemptState(attempt: FullAttempt, spec: PaperSpec): AttemptState {
   const revealed = attempt.status === "SUBMITTED";
   const paused = attempt.room?.status === "PAUSED" && attempt.room.pausedAt;
   const deadline = sectionDeadline(attempt);
   // While the room is paused the clock reads from the moment it stopped, so a
   // paused candidate's remaining time does not drain.
   const effectiveNow = paused ? new Date(attempt.room!.pausedAt!).getTime() : Date.now();
+
   return {
     attemptId: attempt.id,
     mode: attempt.mode,
@@ -272,10 +284,26 @@ export function toAttemptState(attempt: FullAttempt): AttemptState {
     serverNow: Date.now(),
     paused: Boolean(paused),
     tabSwitches: attempt.tabSwitches,
+    paper: {
+      name: spec.paperName,
+      examName: spec.examName,
+      correctMark: spec.correctMark,
+      wrongMark: spec.wrongMark,
+      maxScore: spec.maxScore,
+      totalQuestions: spec.totalQuestions,
+      sections: spec.sections.map((s) => ({
+        index: s.index,
+        name: s.name,
+        shortName: s.shortName,
+        questionCount: s.questionCount,
+        minutes: s.minutes,
+        offset: s.offset,
+      })),
+    },
     questions: attempt.items.map((item) => ({
       order: item.order,
+      sectionIndex: item.sectionIndex,
       questionId: item.questionId,
-      section: item.question.section,
       text: item.question.text,
       options: item.question.options,
       selected: item.selected,
@@ -293,22 +321,25 @@ export function toAttemptState(attempt: FullAttempt): AttemptState {
   };
 }
 
-export function toAttemptResult(attempt: FullAttempt): AttemptResult {
+export function toAttemptResult(attempt: FullAttempt, spec: PaperSpec): AttemptResult {
   const score = scoreAttempt(
     attempt.items.map((item) => ({
-      order: item.order,
+      sectionIndex: item.sectionIndex,
       selected: item.selected,
       answerIndex: item.question.answerIndex,
     })),
+    spec,
   );
   return {
     attemptId: attempt.id,
+    paperName: spec.paperName,
+    examName: spec.examName,
     submittedAt: attempt.submittedAt?.toISOString() ?? null,
     score,
     questions: attempt.items.map((item) => ({
       order: item.order,
+      sectionIndex: item.sectionIndex,
       questionId: item.questionId,
-      section: item.question.section,
       text: item.question.text,
       options: item.question.options,
       selected: item.selected,
@@ -321,6 +352,7 @@ export function toAttemptResult(attempt: FullAttempt): AttemptResult {
 /** Row in the examiner's candidate table. */
 export function toCandidateLive(
   attempt: FullAttempt,
+  spec: PaperSpec,
   presence: { online: boolean; cameraOn: boolean },
 ): CandidateLive {
   let answered = 0;
@@ -334,6 +366,7 @@ export function toCandidateLive(
     if (item.selected === item.question.answerIndex) correct++;
     else wrong++;
   }
+  const section = spec.sections[attempt.currentSection];
   return {
     attemptId: attempt.id,
     userId: attempt.userId,
@@ -344,6 +377,8 @@ export function toCandidateLive(
     online: presence.online,
     cameraOn: presence.cameraOn,
     currentSection: attempt.currentSection,
+    currentSectionName: section?.shortName ?? "—",
+    sectionQuestionCount: section?.questionCount ?? 0,
     currentIndex: attempt.currentIndex,
     answered,
     marked,
@@ -353,21 +388,28 @@ export function toCandidateLive(
     deadlineAt: sectionDeadline(attempt),
     submittedAt: attempt.submittedAt?.toISOString() ?? null,
     totalScore: attempt.totalScore,
+    maxScore: spec.maxScore,
     joinedAt: attempt.joinedAt.toISOString(),
   };
 }
 
 /** The examiner's view of one candidate's paper, answer key included. */
-export function toCandidateSheet(attempt: FullAttempt): CandidateSheet {
+export function toCandidateSheet(attempt: FullAttempt, spec: PaperSpec): CandidateSheet {
   return {
     attemptId: attempt.id,
     name: attempt.user.name,
     currentSection: attempt.currentSection,
     currentIndex: attempt.currentIndex,
+    sections: spec.sections.map((s) => ({
+      index: s.index,
+      shortName: s.shortName,
+      questionCount: s.questionCount,
+      offset: s.offset,
+    })),
     items: attempt.items.map((item) => ({
       order: item.order,
+      sectionIndex: item.sectionIndex,
       questionId: item.questionId,
-      section: item.question.section,
       text: item.question.text,
       options: item.question.options,
       selected: item.selected,

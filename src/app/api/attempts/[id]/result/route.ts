@@ -1,5 +1,5 @@
 import { HttpError, requireUser, route } from "@/lib/auth-server";
-import { toAttemptResult } from "@/lib/attempt";
+import { specOf, toAttemptResult } from "@/lib/attempt";
 import { loadVisibleAttempt } from "@/lib/attempt-access";
 import { prisma } from "@/lib/prisma";
 
@@ -20,7 +20,7 @@ export const GET = route(async (req: Request, ctx: { params: Promise<{ id: strin
   });
 
   return Response.json({
-    result: toAttemptResult(attempt),
+    result: toAttemptResult(attempt, await specOf(attempt)),
     candidateName: attempt.user.name,
     explanations: Object.fromEntries(cached.map((e) => [e.questionId, e.content])),
   });

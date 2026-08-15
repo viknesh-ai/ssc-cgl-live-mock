@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge, EmptyState, cx } from "@/components/ui";
-import { formatClock, sectionShort, QUESTIONS_PER_SECTION } from "@/lib/exam";
+import { formatClock } from "@/lib/exam";
 import type { CandidateLive } from "@/lib/types";
 
 /** Everyone in the room, at a glance. Selecting a row drives the panels beside it. */
@@ -73,9 +73,9 @@ export function CandidateTable({
                     <span className="text-ink-3">Waiting</span>
                   ) : (
                     <>
-                      <div>{sectionShort(c.currentSection)}</div>
+                      <div>{c.currentSectionName}</div>
                       <div className="tabular text-[12px] text-ink-3">
-                        Q{c.currentIndex + 1} of {QUESTIONS_PER_SECTION}
+                        Q{c.currentIndex + 1} of {c.sectionQuestionCount}
                       </div>
                     </>
                   )}

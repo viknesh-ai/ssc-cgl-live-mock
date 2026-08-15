@@ -85,7 +85,7 @@ export function PanelHeader({
 
 export function Label({ children }: { children: ReactNode }) {
   return (
-<span className="eyebrow">{children}</span>
+<span className="eyebrow block">{children}</span>
   );
 }
 

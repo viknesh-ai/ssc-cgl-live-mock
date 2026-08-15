@@ -1,5 +1,11 @@
 /** Shapes exchanged between the server, the REST API and the browser. */
-import type { AttemptMode, AttemptStatus, RoomStatus, Section } from "@/generated/prisma/enums";
+import type {
+  AttemptMode,
+  AttemptStatus,
+  Difficulty,
+  QuestionStatus,
+  RoomStatus,
+} from "@/generated/prisma/enums";
 import type { ScoreSheet } from "@/lib/exam";
 
 export type SessionUser = {
@@ -10,10 +16,28 @@ export type SessionUser = {
   role: "CANDIDATE" | "EXAMINER";
 };
 
+/** A paper's shape, as the browser needs it to lay out the exam. */
+export type PaperView = {
+  name: string;
+  examName: string;
+  correctMark: number;
+  wrongMark: number;
+  maxScore: number;
+  totalQuestions: number;
+  sections: {
+    index: number;
+    name: string;
+    shortName: string;
+    questionCount: number;
+    minutes: number;
+    offset: number;
+  }[];
+};
+
 export type QuestionView = {
   order: number;
+  sectionIndex: number;
   questionId: number;
-  section: Section;
   text: string;
   options: string[];
   selected: number | null;
@@ -39,6 +63,7 @@ export type AttemptState = {
   serverNow: number;
   paused: boolean;
   tabSwitches: number;
+  paper: PaperView;
   questions: QuestionView[];
   room: {
     code: string;
@@ -50,6 +75,8 @@ export type AttemptState = {
 
 export type AttemptResult = {
   attemptId: number;
+  paperName: string;
+  examName: string;
   submittedAt: string | null;
   score: ScoreSheet;
   questions: (QuestionView & { answerIndex: number })[];
@@ -65,6 +92,8 @@ export type CandidateLive = {
   online: boolean;
   cameraOn: boolean;
   currentSection: number;
+  currentSectionName: string;
+  sectionQuestionCount: number;
   currentIndex: number;
   answered: number;
   marked: number;
@@ -74,6 +103,7 @@ export type CandidateLive = {
   deadlineAt: number | null;
   submittedAt: string | null;
   totalScore: number | null;
+  maxScore: number;
   joinedAt: string;
 };
 
@@ -81,7 +111,9 @@ export type RoomView = {
   code: string;
   title: string;
   status: RoomStatus;
-  sectionMinutes: number;
+  paperId: number;
+  paperName: string;
+  examName: string;
   startedAt: string | null;
   endedAt: string | null;
   createdAt: string;
@@ -95,10 +127,11 @@ export type CandidateSheet = {
   name: string;
   currentSection: number;
   currentIndex: number;
+  sections: { index: number; shortName: string; questionCount: number; offset: number }[];
   items: {
     order: number;
+    sectionIndex: number;
     questionId: number;
-    section: Section;
     text: string;
     options: string[];
     selected: number | null;
@@ -114,4 +147,72 @@ export type ChatLine = {
   fromExaminer: boolean;
   senderName: string;
   createdAt: string;
+};
+
+/* ------------------------------ question bank ----------------------------- */
+
+export type ExamView = {
+  id: number;
+  slug: string;
+  name: string;
+  description: string | null;
+  correctMark: number;
+  wrongMark: number;
+  sections: { id: number; order: number; name: string; shortName: string; questionCount: number }[];
+  paperCount: number;
+  questionCount: number;
+};
+
+export type PaperSummary = {
+  id: number;
+  name: string;
+  description: string | null;
+  examId: number;
+  examName: string;
+  archived: boolean;
+  createdAt: string;
+  totalQuestions: number;
+  totalMinutes: number;
+  maxScore: number;
+  sections: {
+    sectionId: number;
+    name: string;
+    shortName: string;
+    questionCount: number;
+    minutes: number;
+    topic: string | null;
+    /** Published questions available to draw from. */
+    available: number;
+  }[];
+  sessionCount: number;
+};
+
+export type BankQuestion = {
+  id: number;
+  examId: number;
+  examName: string;
+  sectionId: number;
+  sectionName: string;
+  sectionShortName: string;
+  text: string;
+  options: string[];
+  answerIndex: number;
+  topic: string | null;
+  difficulty: Difficulty | null;
+  status: QuestionStatus;
+  updatedAt: string;
+  /** How the question has performed in real attempts. */
+  stats: {
+    served: number;
+    correct: number;
+    wrong: number;
+    skipped: number;
+    accuracy: number | null;
+  };
+  hasExplanation: boolean;
+};
+
+export type BankFacets = {
+  topics: string[];
+  total: number;
 };

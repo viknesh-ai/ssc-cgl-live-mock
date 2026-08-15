@@ -1,5 +1,5 @@
 import { requireUser, route } from "@/lib/auth-server";
-import { submitAttempt, syncClock, toAttemptResult } from "@/lib/attempt";
+import { specOf, submitAttempt, syncClock, toAttemptResult } from "@/lib/attempt";
 import { loadOwnAttempt } from "@/lib/attempt-access";
 import { hub } from "@/server/hub";
 
@@ -12,5 +12,5 @@ export const POST = route(async (req: Request, ctx: { params: Promise<{ id: stri
   const attempt = await syncClock(await loadOwnAttempt(user, id));
   const submitted = await submitAttempt(attempt);
   if (submitted.roomId) await hub.publishRoom(submitted.roomId);
-  return Response.json({ result: toAttemptResult(submitted) });
+  return Response.json({ result: toAttemptResult(submitted, await specOf(submitted)) });
 });

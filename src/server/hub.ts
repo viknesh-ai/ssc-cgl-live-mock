@@ -6,9 +6,9 @@
  * watching. Connections are held behind a small interface, which keeps the
  * `ws` dependency out of everything except the socket server itself.
  */
-import { prisma } from "@/lib/prisma";
-import { getAttempt, syncClock, toAttemptState, toCandidateLive } from "@/lib/attempt";
-import { roomAttempts, toRoomView } from "@/lib/room";
+import { getAttempt, specOf, syncClock, toAttemptState, toCandidateLive } from "@/lib/attempt";
+import { getPaperSpec } from "@/lib/paper";
+import { fullRoom, roomAttempts, toRoomView } from "@/lib/room";
 import type { ServerMessage } from "@/lib/realtime-protocol";
 
 export type Connection = {
@@ -80,17 +80,16 @@ class Hub {
     const watchers = this.examinersOf(roomId);
     if (!watchers.length) return;
 
-    const room = await prisma.room.findUnique({
-      where: { id: roomId },
-      include: { examiner: true, _count: { select: { attempts: true } } },
-    });
+    const room = await fullRoom(roomId).catch(() => null);
     if (!room) return;
 
+    // Every candidate in a room sits the same paper, so its shape is loaded once.
+    const spec = await getPaperSpec(room.paperId);
     const attempts = await roomAttempts(roomId);
     const message: ServerMessage = {
       t: "room",
       room: toRoomView(room),
-      candidates: attempts.map((a) => toCandidateLive(a, this.presenceOf(a.id))),
+      candidates: attempts.map((a) => toCandidateLive(a, spec, this.presenceOf(a.id))),
     };
     for (const watcher of watchers) watcher.send(message);
   }
@@ -102,7 +101,10 @@ class Hub {
     const attempt = await getAttempt(attemptId);
     if (!attempt) return;
     const synced = await syncClock(attempt);
-    const message: ServerMessage = { t: "attempt", state: toAttemptState(synced) };
+    const message: ServerMessage = {
+      t: "attempt",
+      state: toAttemptState(synced, await specOf(synced)),
+    };
     for (const target of targets) target.send(message);
   }
 

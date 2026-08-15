@@ -29,10 +29,18 @@ export const POST = route(async (req) => {
     if (!allowed) throw new HttpError(403, "You can only review questions from a paper you finished.");
   }
 
-  const question = await prisma.question.findUnique({ where: { id: questionId } });
+  const question = await prisma.question.findUnique({
+    where: { id: questionId },
+    include: { section: true },
+  });
   if (!question) throw new HttpError(404, "No such question.");
 
-  const { content, model } = await generateExplanation(question);
+  const { content, model } = await generateExplanation({
+    sectionName: question.section.name,
+    text: question.text,
+    options: question.options,
+    answerIndex: question.answerIndex,
+  });
   const saved = await prisma.explanation.upsert({
     where: { questionId },
     create: { questionId, content, model },

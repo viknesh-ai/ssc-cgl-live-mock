@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Badge, cx } from "@/components/ui";
-import { OPTION_LETTERS, QUESTIONS_PER_SECTION, SECTION_ORDER, sectionShort } from "@/lib/exam";
+import { OPTION_LETTERS } from "@/lib/exam";
 import type { CandidateSheet } from "@/lib/types";
 
 /**
@@ -10,7 +10,8 @@ import type { CandidateSheet } from "@/lib/types";
  * right or wrong as they go, and whichever question is open beneath it.
  */
 export function AnswerSheet({ sheet }: { sheet: CandidateSheet }) {
-  const livePosition = sheet.currentSection * QUESTIONS_PER_SECTION + sheet.currentIndex;
+  const livePosition =
+    (sheet.sections[sheet.currentSection]?.offset ?? 0) + sheet.currentIndex;
   const [pinned, setPinned] = useState<number | null>(null);
   const shown = pinned ?? livePosition;
   const item = sheet.items.find((i) => i.order === shown);
@@ -18,23 +19,26 @@ export function AnswerSheet({ sheet }: { sheet: CandidateSheet }) {
   return (
     <div className="px-4 py-4">
       <div className="space-y-3">
-        {SECTION_ORDER.map((section, s) => (
-          <div key={section}>
+        {sheet.sections.map((section) => (
+          <div key={section.index}>
             <div className="mb-1.5 flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.07em] text-ink-3">
-                {sectionShort(s)}
-              </span>
+              <span className="eyebrow block">{section.shortName}</span>
             </div>
-            <div className="grid grid-cols-25 gap-1">
+            <div
+              className="grid gap-1"
+              style={{
+                gridTemplateColumns: `repeat(${Math.min(section.questionCount, 25)}, minmax(0, 1fr))`,
+              }}
+            >
               {sheet.items
-                .filter((i) => Math.floor(i.order / QUESTIONS_PER_SECTION) === s)
+                .filter((i) => i.sectionIndex === section.index)
                 .map((i) => {
                   const answered = i.selected !== null;
                   const correct = answered && i.selected === i.answerIndex;
                   return (
                     <button
                       key={i.order}
-                      title={`${sectionShort(s)} Q${(i.order % QUESTIONS_PER_SECTION) + 1}`}
+                      title={`${section.shortName} Q${i.order - section.offset + 1}`}
                       onClick={() => setPinned(i.order === shown ? null : i.order)}
                       className={cx(
                         "aspect-square rounded-sm border text-[9px] font-semibold",
@@ -47,7 +51,7 @@ export function AnswerSheet({ sheet }: { sheet: CandidateSheet }) {
                         i.order === shown && pinned !== null && "ring-2 ring-ink ring-offset-1",
                       )}
                     >
-                      {(i.order % QUESTIONS_PER_SECTION) + 1}
+                      {i.order - section.offset + 1}
                     </button>
                   );
                 })}
@@ -75,10 +79,11 @@ export function AnswerSheet({ sheet }: { sheet: CandidateSheet }) {
         <div className="mt-4 rounded-md border border-line bg-subtle px-4 py-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="tabular text-[12px] font-semibold text-ink-3">
-              Q{(item.order % QUESTIONS_PER_SECTION) + 1} of {QUESTIONS_PER_SECTION}
+              Q{item.order - (sheet.sections[item.sectionIndex]?.offset ?? 0) + 1} of{" "}
+              {sheet.sections[item.sectionIndex]?.questionCount ?? 0}
             </span>
             <span className="text-[12px] text-ink-3">
-              {sectionShort(Math.floor(item.order / QUESTIONS_PER_SECTION))}
+              {sheet.sections[item.sectionIndex]?.shortName}
             </span>
             {pinned === null ? <Badge tone="accent">Following live</Badge> : (
               <button className="text-[12px] text-accent underline" onClick={() => setPinned(null)}>

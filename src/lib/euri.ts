@@ -5,13 +5,12 @@
  */
 import { serverEnv } from "@/lib/env";
 import { HttpError } from "@/lib/auth-server";
-import { OPTION_LETTERS, SECTION_LABEL } from "@/lib/exam";
-import type { Section } from "@/generated/prisma/enums";
+import { OPTION_LETTERS } from "@/lib/exam";
 
 type ChatMessage = { role: "system" | "user"; content: string };
 
 const SYSTEM_PROMPT = [
-  "You are an SSC CGL Tier-I exam coach in India.",
+  "You are a competitive-examination coach in India.",
   "Explain, for a candidate reviewing a mock test, why the given correct option is correct.",
   "Rules:",
   "- Be concrete. Show the actual working, rule, or fact, not general advice.",
@@ -22,7 +21,7 @@ const SYSTEM_PROMPT = [
 ].join("\n");
 
 export async function generateExplanation(question: {
-  section: Section;
+  sectionName: string;
   text: string;
   options: string[];
   answerIndex: number;
@@ -39,7 +38,7 @@ export async function generateExplanation(question: {
     {
       role: "user",
       content: [
-        `Section: ${SECTION_LABEL[question.section]}`,
+        `Section: ${question.sectionName}`,
         `Question: ${question.text}`,
         `Options:\n${optionList}`,
         `Correct option: ${OPTION_LETTERS[question.answerIndex]}. ${question.options[question.answerIndex]}`,

@@ -1,25 +1,22 @@
 import { z } from "zod";
 import { requireExaminer, route } from "@/lib/auth-server";
-import { createRoom, listRooms } from "@/lib/room";
-import { prisma } from "@/lib/prisma";
-import { toRoomView } from "@/lib/room";
+import { createRoom, listRooms, toRoomView } from "@/lib/room";
 
 export const dynamic = "force-dynamic";
 
 export const GET = route(async (req) => {
-  const examiner = await requireExaminer(req);
-  return Response.json({ rooms: await listRooms(examiner.id) });
+  await requireExaminer(req);
+  return Response.json({ rooms: await listRooms() });
 });
 
-const createSchema = z.object({ title: z.string().max(120).optional() });
+const createSchema = z.object({
+  paperId: z.number().int().positive(),
+  title: z.string().max(120).optional(),
+});
 
 export const POST = route(async (req) => {
   const examiner = await requireExaminer(req);
   const body = createSchema.parse(await req.json().catch(() => ({})));
-  const room = await createRoom(examiner, body.title);
-  const full = await prisma.room.findUniqueOrThrow({
-    where: { id: room.id },
-    include: { examiner: true, _count: { select: { attempts: true } } },
-  });
-  return Response.json({ room: toRoomView(full) }, { status: 201 });
+  const room = await createRoom(examiner, body.paperId, body.title);
+  return Response.json({ room: toRoomView(room) }, { status: 201 });
 });

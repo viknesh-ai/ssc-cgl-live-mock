@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button, Badge, Notice, Spinner, cx } from "@/components/ui";
 import { api } from "@/lib/api-client";
-import { OPTION_LETTERS, QUESTIONS_PER_SECTION, SECTION_ORDER, SECTION_SHORT } from "@/lib/exam";
+import { OPTION_LETTERS } from "@/lib/exam";
 import type { AttemptResult } from "@/lib/types";
 
 type Filter = "all" | "wrong" | "skipped" | number;
@@ -23,11 +23,21 @@ export function ReviewList({
   const [loading, setLoading] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<number, string>>({});
 
+  // Questions are numbered within their section, as the candidate saw them.
+  const sectionOffsets = useMemo(() => {
+    const offsets = new Map<number, number>();
+    for (const q of result.questions) {
+      const current = offsets.get(q.sectionIndex);
+      if (current === undefined || q.order < current) offsets.set(q.sectionIndex, q.order);
+    }
+    return offsets;
+  }, [result.questions]);
+
   const items = useMemo(() => {
     return result.questions.filter((q) => {
       if (filter === "wrong") return q.selected !== null && q.selected !== q.answerIndex;
       if (filter === "skipped") return q.selected === null;
-      if (typeof filter === "number") return Math.floor(q.order / QUESTIONS_PER_SECTION) === filter;
+      if (typeof filter === "number") return q.sectionIndex === filter;
       return true;
     });
   }, [result.questions, filter]);
@@ -63,7 +73,10 @@ export function ReviewList({
     { key: "wrong", label: `Wrong (${counts.wrong})` },
     { key: "skipped", label: `Skipped (${counts.skipped})` },
     { key: "all", label: `All (${result.questions.length})` },
-    ...SECTION_ORDER.map((section, i) => ({ key: i as Filter, label: SECTION_SHORT[section] })),
+    ...result.score.sections.map((section) => ({
+      key: section.index as Filter,
+      label: section.shortName,
+    })),
   ];
 
   return (
@@ -99,9 +112,11 @@ export function ReviewList({
               <li key={q.order} className="px-5 py-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="tabular text-[12px] font-semibold text-ink-3">
-                    Q{(q.order % QUESTIONS_PER_SECTION) + 1}
+                    Q{q.order - (sectionOffsets.get(q.sectionIndex) ?? 0) + 1}
                   </span>
-                  <span className="text-[12px] text-ink-3">{SECTION_SHORT[q.section]}</span>
+                  <span className="text-[12px] text-ink-3">
+                    {result.score.sections[q.sectionIndex]?.shortName}
+                  </span>
                   {skipped ? (
                     <Badge>Not attempted</Badge>
                   ) : correct ? (
