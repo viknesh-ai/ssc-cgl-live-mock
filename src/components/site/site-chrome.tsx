@@ -10,7 +10,9 @@ import { APP_NAME } from "@/lib/brand";
 
 const NAV = [
   { href: "/exams", label: "Exams" },
+  { href: "/dashboard", label: "Mock tests" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/admin", label: "For institutions" },
   { href: "/careers", label: "Careers" },
 ];
 
@@ -33,7 +35,7 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cx(
-                  "text-[13.5px] transition-colors",
+                  "text-[15px] transition-colors",
                   pathname.startsWith(item.href)
                     ? "font-medium text-ink"
                     : "text-ink-2 hover:text-ink",
@@ -49,20 +51,20 @@ export function SiteHeader() {
           {ready && session ? (
             <>
               <Link href="/dashboard" className="hidden sm:block">
-                <Button size="sm">My papers</Button>
+                <Button>My papers</Button>
               </Link>
-              <Button variant="quiet" size="sm" onClick={signOut}>
+              <Button variant="quiet" onClick={signOut}>
                 Sign out
               </Button>
             </>
           ) : ready ? (
-            <Button variant="primary" size="sm" onClick={() => void signIn()}>
+            <Button variant="primary" onClick={() => void signIn()}>
               Sign in
             </Button>
           ) : null}
           <button
             aria-label="Menu"
-            className="rounded-md border border-line-strong px-2.5 py-1.5 text-[13px] text-ink-2 md:hidden"
+            className="rounded-md border border-line-strong px-3 py-2 text-[14px] text-ink-2 md:hidden"
             onClick={() => setOpen((o) => !o)}
           >
             Menu
@@ -78,7 +80,7 @@ export function SiteHeader() {
                 <Link
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="block py-2 text-[14px] text-ink-2"
+                  className="block py-2.5 text-[15px] text-ink-2"
                 >
                   {item.label}
                 </Link>
@@ -97,17 +99,17 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <Wordmark />
-          <p className="mt-3 max-w-xs text-[13px] leading-relaxed text-ink-2">
-            Timed mock examinations with live invigilation and an AI review of every answer.
+          <p className="mt-3 max-w-xs text-[14px] leading-relaxed text-ink-2">
+Timed mock tests, marked instantly, explained by AI.
           </p>
         </div>
 
         <FooterColumn
-          title="Product"
+          title="Mock tests"
           links={[
-            { href: "/exams", label: "Exams" },
-            { href: "/pricing", label: "Pricing" },
+            { href: "/exams", label: "All exams" },
             { href: "/dashboard", label: "My papers" },
+            { href: "/pricing", label: "Pricing" },
           ]}
         />
         <FooterColumn
@@ -131,7 +133,7 @@ export function SiteFooter() {
           <span>
             © {new Date().getFullYear()} {APP_NAME}
           </span>
-          <span>Mock examinations for practice. Not affiliated with any examining authority.</span>
+          <span>Mock tests for practice. Not affiliated with any examining authority.</span>
         </div>
       </div>
     </footer>
@@ -151,7 +153,7 @@ function FooterColumn({
       <ul className="mt-3 space-y-2">
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="text-[13px] text-ink-2 hover:text-ink">
+            <Link href={link.href} className="text-[14px] text-ink-2 hover:text-ink">
               {link.label}
             </Link>
           </li>

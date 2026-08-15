@@ -67,28 +67,26 @@ export default function ExamPage({ params }: { params: Promise<{ slug: string }>
   return (
     <SitePage>
       <div className="mx-auto max-w-4xl px-5 py-12">
-        <Link href="/exams" className="text-[13px] text-ink-2 hover:text-ink">
+        <Link href="/exams" className="text-[15px] text-ink-2 hover:text-ink">
           ← All exams
         </Link>
 
         <div className="mt-4">
           <p className="eyebrow block">{exam.region ?? "International"}</p>
-          <h1 className="mt-2 font-display text-3xl tracking-tight text-ink">{exam.name}</h1>
+          <h1 className="mt-2 font-display text-4xl tracking-tight text-ink">{exam.name}</h1>
           {exam.description ? (
-            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-2">
-              {exam.description}
-            </p>
+            <p className="mt-3 max-w-2xl text-[16px] text-ink-2">{exam.description}</p>
           ) : null}
         </div>
 
-        <dl className="mt-8 divide-y divide-line border-y border-line text-[13.5px]">
+        <dl className="mt-8 divide-y divide-line border-y border-line text-[15px]">
           {[
-            ["Sections", exam.sections.map((s) => s.name).join(", ")],
-            ["Marking", `+${exam.correctMark} for a correct answer, ${exam.wrongMark} for a wrong one`],
-            ["Question bank", `${exam.questionCount} questions`],
+            ["Sections", exam.sections.map((s) => s.shortName).join(" · ")],
+            ["Marking", `+${exam.correctMark} correct · ${exam.wrongMark} wrong`],
+            ["Bank", `${exam.questionCount} questions`],
           ].map(([label, value]) => (
             <div key={label} className="flex gap-6 py-3">
-              <dt className="w-40 shrink-0 text-ink-3">{label}</dt>
+              <dt className="w-32 shrink-0 text-ink-3">{label}</dt>
               <dd className="text-ink">{value}</dd>
             </div>
           ))}
@@ -100,18 +98,18 @@ export default function ExamPage({ params }: { params: Promise<{ slug: string }>
           </div>
         ) : null}
 
-        <h2 className="mt-10 font-display text-xl tracking-tight text-ink">Papers</h2>
+        <h2 className="mt-10 font-display text-[26px] tracking-tight text-ink">Papers</h2>
         <div className="mt-4 space-y-4">
           {exam.papers.length === 0 ? (
             <Panel>
-              <EmptyState title="No papers yet" hint="Papers for this exam are being prepared." />
+              <EmptyState title="Coming soon" hint="Papers for this exam are being prepared." />
             </Panel>
           ) : (
             exam.papers.map((paper) => (
               <Panel key={paper.id}>
                 <PanelHeader
                   title={paper.name}
-                  meta={`${paper.questions} questions · ${paper.minutes} minutes · ${paper.maxScore} marks`}
+                  meta={`${paper.questions} questions · ${paper.minutes} min · ${paper.maxScore} marks`}
                   actions={
                     ready && !session ? (
                       <Button variant="primary" onClick={() => void signIn()}>

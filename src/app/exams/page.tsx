@@ -1,72 +1,55 @@
 "use client";
 
-import Link from "next/link";
 import { SitePage } from "@/components/site/site-chrome";
+import { ExamCard } from "@/components/site/exam-card";
 import { Spinner } from "@/components/ui";
-import { byRegion, useCatalogue } from "@/lib/catalogue";
+import { catalogueGroups, useCatalogue } from "@/lib/catalogue";
 
-/** The public catalogue, grouped by where each exam is sat. */
+/** The catalogue: every exam we carry, grouped the way candidates search for them. */
 export default function ExamsPage() {
   const exams = useCatalogue();
-  const groups = exams ? byRegion(exams) : [];
+  const groups = exams ? catalogueGroups(exams) : [];
+  const ready = exams?.filter((e) => e.papers.length > 0).length ?? 0;
 
   return (
     <SitePage>
       <div className="mx-auto max-w-6xl px-5 py-12">
-        <h1 className="font-display text-3xl tracking-tight text-ink">Exams</h1>
-        <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-ink-2">
-          Each exam keeps its own sections, timing and marking — including negative marking where it
-          applies. Papers are drawn fresh from the question bank every time, so a second attempt is
-          not the same paper again.
+        <h1 className="font-display text-4xl tracking-tight text-ink">Exams</h1>
+        <p className="mt-3 text-[16px] text-ink-2">
+          {exams === null
+            ? "Loading…"
+            : `${ready} ready to sit now. More each week.`}
         </p>
 
         {exams === null ? (
-          <div className="flex justify-center py-16">
+          <div className="flex justify-center py-20">
             <Spinner />
           </div>
-        ) : exams.length === 0 ? (
-          <p className="py-10 text-[14px] text-ink-2">Papers are being prepared.</p>
         ) : (
-          <div className="mt-10 space-y-12">
-            {groups.map(([region, list]) => (
-              <section key={region}>
-                <h2 className="eyebrow block">{region}</h2>
-                <div className="mt-3 border-t-2 border-ink">
-                  {list.map((exam) => (
-                    <Link
-                      key={exam.id}
-                      href={`/exams/${exam.slug}`}
-                      className="flex flex-wrap items-start justify-between gap-4 border-b border-line py-5 hover:bg-surface"
-                    >
-                      <div className="min-w-0 max-w-xl">
-                        <h3 className="font-display text-lg tracking-tight text-ink">
-                          {exam.name}
-                        </h3>
-                        {exam.description ? (
-                          <p className="mt-1 text-[13px] leading-relaxed text-ink-2">
-                            {exam.description}
-                          </p>
-                        ) : null}
-                        <p className="mt-2 text-[12.5px] text-ink-3">
-                          {exam.sections.map((s) => s.shortName).join(" · ")}
-                        </p>
-                      </div>
-                      <div className="tabular shrink-0 text-right text-[12.5px] text-ink-3">
-                        <div>
-                          {exam.papers.length} paper{exam.papers.length === 1 ? "" : "s"}
-                        </div>
-                        <div>{exam.questionCount} questions</div>
-                        <div>
-                          +{exam.correctMark} / {exam.wrongMark}
-                        </div>
-                      </div>
-                    </Link>
+          <div className="mt-12 space-y-12">
+            {groups.map((group) => (
+              <section key={group.title}>
+                <h2 className="font-display text-[22px] tracking-tight text-ink">{group.title}</h2>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.entries.map((entry) => (
+                    <ExamCard key={entry.name} entry={entry} />
                   ))}
                 </div>
               </section>
             ))}
           </div>
         )}
+
+        <p className="mt-14 border-t border-line pt-6 text-[14px] text-ink-2">
+          Need an exam that is not here?{" "}
+          <a
+            href="mailto:hello@invigil.app?subject=Exam%20request"
+            className="text-accent underline underline-offset-4"
+          >
+            Tell us
+          </a>
+          .
+        </p>
       </div>
     </SitePage>
   );

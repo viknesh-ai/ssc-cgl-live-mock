@@ -102,8 +102,8 @@ export default function DashboardPage() {
         <h1 className="font-display text-3xl tracking-tight text-ink">
           {session.name.split(" ")[0]}&apos;s papers
         </h1>
-        <p className="mt-1.5 text-[14px] text-ink-2">
-          Start a paper on your own, or join a supervised session with its code.
+        <p className="mt-1.5 text-[16px] text-ink-2">
+          Start a paper, or join a session with its code.
         </p>
 
         {error ? (
@@ -114,7 +114,7 @@ export default function DashboardPage() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div>
-            <h2 className="eyebrow block">Practise on your own</h2>
+            <h2 className="font-display text-[22px] tracking-tight text-ink">Mock tests</h2>
             <div className="mt-3 border-t-2 border-ink">
               {exams === null ? (
                 <div className="flex justify-center py-10">
@@ -133,10 +133,9 @@ export default function DashboardPage() {
                         <h3 className="font-display text-lg tracking-tight text-ink">
                           {exam.name}
                         </h3>
-                        <p className="mt-0.5 text-[13px] text-ink-2">{paper.name}</p>
-                        <p className="mt-1.5 text-[12.5px] text-ink-3">
-                          {paper.questions} questions · {paper.minutes} minutes · {paper.maxScore}{" "}
-                          marks · +{exam.correctMark} / {exam.wrongMark}
+                        <p className="mt-0.5 text-[14px] text-ink-2">{paper.name}</p>
+                        <p className="mt-1.5 text-[14px] text-ink-3">
+                          {paper.questions} questions · {paper.minutes} min · {paper.maxScore} marks
                         </p>
                       </div>
                       <Button disabled={busy !== null} onClick={() => practise(paper.id)}>
@@ -152,7 +151,7 @@ export default function DashboardPage() {
             <Panel className="mt-8">
               <PanelHeader
                 title="Join a supervised session"
-                meta="Your camera stays with the examiner for the whole paper."
+                meta="Your camera stays with the examiner."
               />
               <div className="flex flex-wrap items-end gap-3 px-5 py-4">
                 <label className="min-w-45 flex-1">
