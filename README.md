@@ -1,9 +1,12 @@
-# SSC CGL Tier-I Live Mock
+# Invigil
 
-A proctored mock-examination platform for SSC CGL Tier-I: 100 questions in four
-15-minute sections, live invigilation over camera, an examiner console that
-marks answers as candidates write them, and an AI review that explains any
-question once the paper is done.
+An invigilated mock-examination platform. Candidates sit timed papers under
+camera supervision; the examiner watches progress and marks live; afterwards an
+AI explains any question the candidate wants worked through.
+
+The first paper is SSC CGL Tier-I — 100 questions in four 15-minute sections —
+but the platform is not tied to it: papers are listed in `src/lib/brand.ts` and
+more can be added alongside.
 
 ## Stack
 
@@ -13,7 +16,7 @@ question once the paper is done.
 | Styling | Tailwind CSS v4 |
 | Data | Postgres via Prisma 7 (Railway Postgres) |
 | Realtime | `ws` websocket server attached to the Next.js HTTP server |
-| Identity | Firebase Authentication, Google sign-in only |
+| Identity | Firebase (Google) for candidates, signed session cookie for examiners |
 | Proctoring | WebRTC (STUN, optional TURN) with a snapshot fallback |
 | AI review | EURI chat-completions (`gemini-2.5-pro` by default) |
 | Hosting | Railway — one web service plus the Postgres database |
@@ -58,7 +61,9 @@ question, so the same explanation is generated once and reused for everyone.
    | Variable | Value |
    | --- | --- |
    | `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` |
-   | `EXAMINER_EMAIL` | the Google account that runs exams |
+   | `ADMIN_USERNAME` | examiner login, e.g. `examiner` |
+   | `ADMIN_PASSWORD` | examiner password, shared by all examiners |
+   | `ADMIN_SESSION_SECRET` | any long random string; signs session cookies |
    | `NEXT_PUBLIC_FIREBASE_API_KEY` | from the Firebase web app config |
    | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | `your-project.firebaseapp.com` |
    | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | your Firebase project id |
@@ -70,7 +75,8 @@ question, so the same explanation is generated once and reused for everyone.
 4. **Generate a domain** (Settings → Networking → Generate Domain). Railway
    proxies websockets on the same domain, so nothing else is needed for `/ws`.
 5. **Authorise the domain in Firebase**: Authentication → Settings → Authorized
-   domains → add `your-app.up.railway.app`. Google sign-in fails without this.
+   domains → add `your-app.up.railway.app`. Google sign-in fails without this,
+   on every device.
 6. **Enable Google sign-in** in Firebase: Authentication → Sign-in method →
    Google.
 
@@ -78,11 +84,21 @@ The first deploy applies `prisma/migrations` and loads the 100 questions from
 `prisma/questions.json`. Re-running the seed updates existing questions rather
 than duplicating them, so redeploys are safe.
 
-### Who is the examiner
+### Signing in
 
-Exactly one account, set by `EXAMINER_EMAIL`. That account gets the examiner
-console at `/admin`; everyone else is a candidate. The role is decided on the
-server from the verified Google token — it cannot be set from the browser.
+**Candidates** sign in with Google. Firebase's sign-in handler is proxied
+through this app's own domain (see `rewrites` in `next.config.ts`), which keeps
+the flow first-party — without that, sign-in works on desktop but fails on
+phones and anywhere third-party storage is blocked.
+
+**Examiners** go to `/admin` and use the shared username and password from
+`ADMIN_USERNAME` / `ADMIN_PASSWORD`. Each browser gets its own signed session
+cookie, so several examiners can invigilate the same room at the same time, from
+whatever device is to hand. Sessions last 30 days; changing `ADMIN_PASSWORD` (or
+`ADMIN_SESSION_SECRET`) signs everyone out.
+
+Optionally, setting `EXAMINER_EMAIL` also grants examiner rights to that one
+Google account. It is not required.
 
 ### Camera through restrictive networks (optional)
 
@@ -144,6 +160,14 @@ src/hooks/                 Websocket, camera publisher, camera viewer
 src/lib/                   Exam rules, scoring, auth, EURI client
 src/server/                Websocket server and connection registry
 ```
+
+## Adding another paper
+
+`src/lib/brand.ts` holds the paper list shown to candidates, and `APP_NAME` —
+change it there and the name changes throughout. The exam engine itself is
+driven by `src/lib/exam.ts` (sections, questions per section, marking), so a
+paper with a different shape means changing those constants and the `Section`
+enum in the Prisma schema.
 
 ## Notes
 
