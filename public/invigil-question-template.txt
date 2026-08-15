@@ -1,0 +1,75 @@
+INVIGIL — QUESTION PAPER TEMPLATE
+=================================
+
+Fill this in, save it as PDF, Word (.docx) or plain text, and upload it under
+Import. Delete these instructions before uploading — or leave them, they are
+ignored.
+
+RULES
+- "Section:" applies to every question below it, until the next Section line.
+- Number questions 1. or 1) or Q1. or Q.1
+- Options may be (A) or A) or A. and may be lower case.
+- "Answer:" may be a letter, a number, or the option's own text.
+- "Explanation:", "Topic:" and "Difficulty:" are optional.
+- Leave a blank line between questions.
+- The blank rows at the end are for you to fill in. Anything left empty is
+  reported and skipped, never imported half-finished.
+
+--------------------------------- EXAMPLE ---------------------------------
+
+Section: Quantitative Aptitude
+
+1. A train 180 m long crosses a pole in 12 seconds. What is its speed?
+(A) 54 km/h
+(B) 60 km/h
+(C) 45 km/h
+(D) 72 km/h
+Answer: A
+Explanation: Speed = 180 / 12 = 15 m/s = 15 x 18/5 = 54 km/h.
+Topic: Speed and distance
+Difficulty: Easy
+
+2. Simplify: 25% of 480 + 15% of 200
+(A) 140
+(B) 150
+(C) 130
+(D) 160
+Answer: B
+Explanation: 120 + 30 = 150.
+Topic: Percentages
+Difficulty: Easy
+
+Section: General Awareness
+
+3. Who wrote the national anthem of India?
+(A) Bankim Chandra Chatterjee
+(B) Rabindranath Tagore
+(C) Sarojini Naidu
+(D) Muhammad Iqbal
+Answer: B
+Explanation: Rabindranath Tagore wrote Jana Gana Mana in 1911.
+Topic: Modern history
+
+------------------------------ YOUR QUESTIONS ------------------------------
+
+Section: 
+
+1. 
+(A) 
+(B) 
+(C) 
+(D) 
+Answer: 
+Explanation: 
+Topic: 
+Difficulty: 
+
+2. 
+(A) 
+(B) 
+(C) 
+(D) 
+Answer: 
+Explanation: 
+Topic: 
+Difficulty: 

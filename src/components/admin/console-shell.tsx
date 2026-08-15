@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { Wordmark } from "@/components/wordmark";
@@ -8,12 +9,18 @@ import { Button, Input, Notice, Spinner, cx } from "@/components/ui";
 import { APP_NAME } from "@/lib/brand";
 
 /**
- * The proctoring console: sign-in gate and the page beneath it.
+ * The institution console: sign-in gate, sidebar, and the page beside it.
  *
- * This is where sittings are run and watched. Making the content that
- * candidates sit — exams, papers, questions — happens in the studio, which is
- * deliberately not linked from here.
+ * An institution runs its own examinations here — its question bank, its
+ * papers, and the sittings themselves. Only the exam definitions behind them
+ * are ours to edit, which is what the studio is for.
  */
+const NAV = [
+  { href: "/admin", label: "Sessions", hint: "Run and watch a sitting" },
+  { href: "/admin/papers", label: "Papers", hint: "What candidates sit" },
+  { href: "/admin/questions", label: "Question bank", hint: "Write and edit" },
+  { href: "/admin/import", label: "Import", hint: "PDF, Word or text" },
+];
 export function ConsoleShell({
   title,
   description,
@@ -26,6 +33,7 @@ export function ConsoleShell({
   children: React.ReactNode;
 }) {
   const { ready, session, signOut } = useAuth();
+  const pathname = usePathname();
 
   if (!ready) {
     return (
@@ -53,7 +61,37 @@ export function ConsoleShell({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col md:flex-row">
+        <nav className="shrink-0 border-b border-line bg-surface md:w-56 md:border-b-0 md:border-r">
+          <ul className="flex gap-1 overflow-x-auto p-3 md:flex-col md:gap-0.5">
+            {NAV.map((item) => {
+              const active =
+                item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+              return (
+                <li key={item.href} className="shrink-0">
+                  <Link
+                    href={item.href}
+                    className={cx(
+                      "block rounded-md px-3 py-2 text-[14px] transition-colors",
+                      active ? "bg-ink text-white" : "text-ink-2 hover:bg-subtle hover:text-ink",
+                    )}
+                  >
+                    <span className="font-medium">{item.label}</span>
+                    <span
+                      className={cx(
+                        "mt-0.5 hidden text-[12px] md:block",
+                        active ? "text-white/60" : "text-ink-3",
+                      )}
+                    >
+                      {item.hint}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
         <main className="min-w-0 flex-1 px-5 py-7">
           <div className="mx-auto max-w-5xl">
             <div className="flex flex-wrap items-start justify-between gap-4">
