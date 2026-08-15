@@ -101,6 +101,23 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 .rev .o{padding:5px 9px;border-radius:6px;margin:3px 0;font-size:13.5px}
 .rev .o.right{background:#dcfce7;color:#14532d;font-weight:650}
 .rev .o.chosen{background:#fee2e2;color:#991b1b;font-weight:650}
+.who{font-size:12.5px;color:#c7d2fe;text-align:right;line-height:1.3}
+.authbtn{background:rgba(255,255,255,.14);color:#fff;padding:7px 12px;font-size:12.5px}
+.authbtn:hover{background:rgba(255,255,255,.24)}
+.chatwrap{display:flex;flex-direction:column;height:280px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.chatlog{flex:1;overflow-y:auto;padding:12px;background:var(--soft);display:flex;flex-direction:column;gap:8px}
+.msg{max-width:78%;padding:8px 12px;border-radius:12px;font-size:13.5px;line-height:1.45}
+.msg.them{background:#fff;border:1px solid var(--line);align-self:flex-start}
+.msg.me{background:var(--brand);color:#fff;align-self:flex-end}
+.msg .t{display:block;font-size:10.5px;opacity:.65;margin-top:3px}
+.chatbar{display:flex;gap:7px;padding:9px;border-top:1px solid var(--line);background:#fff}
+.chatbar input{flex:1}
+.chatdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-left:5px}
+.selfcam{position:fixed;right:14px;bottom:14px;width:132px;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);z-index:90;background:#000}
+.selfcam video{width:100%;display:block}
+.selfcam .lbl{font-size:10px;color:#fff;background:rgba(0,0,0,.6);padding:3px 6px;text-align:center}
+.provideo{width:100%;background:#000;border-radius:10px;min-height:180px}
+.strike{background:#fef2f2;color:#991b1b;border-radius:6px;padding:3px 9px;font-weight:750;font-size:12px}
 .tabs{display:flex;gap:6px;background:var(--line);padding:4px;border-radius:10px;margin-bottom:16px}
 .tab{flex:1;background:transparent;color:var(--muted);padding:9px;font-size:14px}
 .tab.on{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.1)}
@@ -120,7 +137,11 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 <body>
 <header><div class="top">
   <div><h1>SSC CGL Tier-I Live Mock</h1><div class="sub" id="hsub">100 Questions · 4 × 15 minutes · 200 marks</div></div>
-  <div id="timer" class="timer">--:--</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div id="whoami" class="who hidden"></div>
+    <button id="authBtn" class="authbtn hidden" onclick="authAction()">Sign out</button>
+    <div id="timer" class="timer">--:--</div>
+  </div>
 </div></header>
 
 <div class="wrap">
@@ -192,6 +213,33 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
       </div>
     </div>
     <div class="card">
+      <h3>Proctoring</h3>
+      <div class="row" style="margin-bottom:12px">
+        <input id="uidLookup" placeholder="Open a candidate by their UID">
+        <button class="secondary" onclick="lookupUid()">Open UID</button>
+      </div>
+      <div class="monitor" style="grid-template-columns:repeat(2,1fr)">
+        <div class="stat">Tab switches<b id="strikeCount">—</b></div>
+        <div class="stat">Candidate UID<b id="candUid" style="font-size:11px;word-break:break-all">—</b></div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="watchCamBtn" onclick="watchCam()">Watch camera &amp; mic</button>
+        <button class="secondary" onclick="stopCam()">Stop watching</button>
+      </div>
+      <video id="proVideo" class="provideo hidden" autoplay playsinline controls style="margin-top:12px"></video>
+      <p class="small" id="proStatus" style="margin-bottom:0">Pick a candidate, then press Watch to open their camera feed.</p>
+    </div>
+    <div class="card">
+      <h3>Chat with candidate</h3>
+      <div class="chatwrap">
+        <div id="aChatLog" class="chatlog"><span class="small">Select a candidate to chat.</span></div>
+        <div class="chatbar">
+          <input id="aChatIn" placeholder="Message this candidate…" maxlength="400">
+          <button class="primary" onclick="sendChatAdmin()">Send</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
       <h3>Live Section Progress</h3>
       <table><thead><tr><th>Section</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Score</th><th>Accuracy</th></tr></thead>
       <tbody id="liveTable"></tbody></table>
@@ -223,12 +271,27 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
         <aside class="card">
           <b style="font-size:13.5px">Question Palette</b>
           <div id="palette" class="palette" style="margin-top:12px"></div>
-          <p class="small" style="margin-bottom:0">Green = answered · yellow ring = marked for review · blue = current.</p>
+          <p class="small">Green = answered · yellow ring = marked for review · blue = current.</p>
+          <div style="border-top:1px solid var(--line);margin:14px -22px 0;padding:14px 22px 0">
+            <b style="font-size:13.5px">Message the examiner<span id="chatDot" class="chatdot hidden"></span></b>
+            <div class="chatwrap" style="height:230px;margin-top:10px">
+              <div id="chatLog" class="chatlog"><span class="small">No messages yet.</span></div>
+              <div class="chatbar">
+                <input id="chatIn" placeholder="Type a message…" maxlength="400">
+                <button class="primary" onclick="sendChat()">Send</button>
+              </div>
+            </div>
+          </div>
         </aside>
       </div>
     </div>
     <div id="candidateResult" class="hidden"></div>
   </div>
+</div>
+
+<div id="selfCam" class="selfcam hidden">
+  <video id="selfVideo" autoplay muted playsinline></video>
+  <div class="lbl">You are being proctored</div>
 </div>
 
 <!-- pause overlay -->
@@ -244,10 +307,10 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 <script src="firebase-config.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged,
-         setPersistence, browserLocalPersistence, browserSessionPersistence, signOut, updateProfile }
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, GoogleAuthProvider, signInWithPopup,
+         setPersistence, browserLocalPersistence, browserSessionPersistence, signOut }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import { getDatabase, ref, get, set, update, onValue, off }
+import { getDatabase, ref, get, set, update, onValue, off, push, remove, onChildAdded }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
 const API = "https://ssc-cgl-exam-api.viknesh-v-aids20.workers.dev";
@@ -263,9 +326,6 @@ const SECTIONS = [
  "English Language & Comprehension"
 ];
 const SECTION_MS = 15 * 60 * 1000;
-// Accounts are phone-number based; Firebase stores them as e-mail/password.
-const PHONE_DOMAIN = "@sscmock.local";
-const phoneToEmail = p => String(p).replace(/\D/g, "") + PHONE_DOMAIN;
 
 const params = new URLSearchParams(location.search);
 let roomId = params.get("room");
@@ -292,90 +352,89 @@ function setErr(msg){ const e=$("loginErr"); if(e) e.innerHTML = msg ? `<div cla
 // so nothing renders until Firebase has told us whether a session is restored.
 let booted = false;
 async function boot(){
-  $("setupTitle").textContent = "Loading…";
-  $("setupBody").innerHTML = `<p class="small">Restoring your session…</p>`;
+  $("setupTitle").textContent = "Loading\u2026";
+  $("setupBody").innerHTML = `<p class="small">Restoring your session\u2026</p>`;
   onAuthStateChanged(auth, async u => {
     if(booted) return;
     booted = true;
     user = u || null;
     if(adminMode){
-      if(u) { hide("setup"); show("examiner"); await enterAdmin(); }
+      if(u){ hide("setup"); show("examiner"); await enterAdmin(); }
       else renderAdminLogin();
       return;
     }
+    paintWhoami();
     if(u) await afterCandidateLogin();
-    else renderAuth("login");
+    else renderCandidateLogin();
   });
 }
 
-// Two distinct screens: Register collects a name, Login only needs the number.
-function renderAuth(mode){
-  const isReg = mode === "register";
-  $("setupTitle").textContent = isReg ? "Create your account" : "Login";
+function paintWhoami(){
+  const w = $("whoami"), b = $("authBtn");
+  if(adminMode){ w.classList.add("hidden"); b.classList.add("hidden"); return }
+  if(user){
+    w.textContent = user.displayName || user.email || "Signed in";
+    w.classList.remove("hidden");
+    b.textContent = "Sign out"; b.classList.remove("hidden");
+  }else{
+    w.classList.add("hidden");
+    b.textContent = "Sign in"; b.classList.remove("hidden");
+  }
+}
+window.authAction = async () => {
+  if(user){
+    if(!confirm("Sign out?")) return;
+    localStorage.removeItem("sscPaperId");
+  stopMedia();
+    await signOut(auth);
+    location.reload();
+  }else googleSignIn();
+};
+
+// A test can only be taken through an examiner's room link. Landing on the bare
+// site is not enough to get in.
+function renderCandidateLogin(){
+  if(!roomId){
+    $("setupTitle").textContent = "You need an invite link";
+    $("setupBody").innerHTML = `
+      <p class="small">This exam is available only through a room link from your examiner.
+      It looks like:</p>
+      <div class="notice" style="word-break:break-all;font-family:ui-monospace,monospace;font-size:12.5px">${esc(location.origin + location.pathname)}?room=ABC123</div>
+      <p class="small">Ask your examiner for the link, then open it on this device.</p>`;
+    return;
+  }
+  $("setupTitle").textContent = "Sign in to join";
   $("setupBody").innerHTML = `
-    <div class="tabs">
-      <button class="tab ${!isReg ? "on" : ""}" id="tabLogin">Login</button>
-      <button class="tab ${isReg ? "on" : ""}" id="tabReg">Register</button>
-    </div>
-    ${isReg ? `<label class="field"><span>Your name</span><input id="nm" placeholder="Full name" autocomplete="name"></label>` : ""}
-    <label class="field"><span>Phone number</span><input id="phone" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="username"></label>
-    <label class="field"><span>Password</span><input id="pw" type="password" placeholder="${isReg ? "At least 6 characters" : "Your password"}" autocomplete="${isReg ? "new-password" : "current-password"}"></label>
-    <label class="small" style="display:flex;gap:8px;align-items:center;margin:2px 0 6px">
+    <p class="small" style="margin-top:0">Room <b>${esc(roomId)}</b>. Sign in with your Google account
+    to join. Your account keeps track of which questions you have already seen, so you never get a repeat.</p>
+    <div class="actions"><button class="primary" id="gBtn" style="flex:1">Continue with Google</button></div>
+    <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:12px">
       <input type="checkbox" id="remember" checked style="width:auto"> Keep me signed in on this device
     </label>
-    <div class="actions"><button class="primary" id="goBtn" style="flex:1">${isReg ? "Create account" : "Login"}</button></div>
-    <p class="small" style="margin-top:10px">${isReg ? "Already registered? Switch to Login." : "New here? Switch to Register — an account keeps track of which questions you have already seen."}</p>
     <div id="loginErr"></div>`;
-  $("tabLogin").onclick = () => renderAuth("login");
-  $("tabReg").onclick = () => renderAuth("register");
-  $("goBtn").onclick = () => candidateAuth(isReg);
-  $("pw").onkeydown = e => { if(e.key === "Enter") candidateAuth(isReg) };
+  $("gBtn").onclick = googleSignIn;
 }
 
-function renderAdminLogin(){
-  $("setupTitle").textContent = "Examiner Login";
-  $("setupBody").innerHTML = `
-    <label class="field"><span>Examiner email</span><input id="email" placeholder="you@example.com" autocomplete="username"></label>
-    <label class="field"><span>Password</span><input id="password" type="password" autocomplete="current-password"></label>
-    <div class="actions"><button class="primary" id="loginBtn" style="flex:1">Login</button></div>
-    <div id="loginErr"></div>`;
-  $("loginBtn").onclick = adminLogin;
-  $("password").onkeydown = e => { if(e.key === "Enter") adminLogin() };
-}
-
-async function candidateAuth(isSignup){
-  const phone = $("phone").value.trim().replace(/\D/g, "");
-  const pw = $("pw").value;
-  const nm = isSignup ? ($("nm").value || "").trim() : "";
+async function googleSignIn(){
   setErr("");
-  if(isSignup && nm.length < 2) return setErr("Please enter your name.");
-  if(phone.length < 10) return setErr("Enter a valid 10-digit phone number.");
-  if(pw.length < 6) return setErr("Password must be at least 6 characters.");
-  const btn = $("goBtn"); btn.disabled = true; btn.textContent = "Please wait…";
+  const btn = $("gBtn"); if(btn){ btn.disabled = true; btn.textContent = "Opening Google\u2026" }
   try{
-    await setPersistence(auth, $("remember").checked ? browserLocalPersistence : browserSessionPersistence);
-    const email = phoneToEmail(phone);
-    let cred;
-    if(isSignup){
-      try{ cred = await createUserWithEmailAndPassword(auth, email, pw); }
-      catch(e){
-        if(e.code === "auth/email-already-in-use"){ btn.disabled=false; btn.textContent="Create account"; return setErr("That number is already registered. Switch to Login."); }
-        throw e;
-      }
-      await updateProfile(cred.user, { displayName: nm });
-    }else{
-      try{ cred = await signInWithEmailAndPassword(auth, email, pw); }
-      catch(e){
-        btn.disabled = false; btn.textContent = "Login";
-        if(e.code === "auth/invalid-credential" || e.code === "auth/user-not-found" || e.code === "auth/wrong-password")
-          return setErr("Wrong number or password. If you have not registered yet, switch to Register.");
-        throw e;
-      }
-    }
+    const remember = $("remember") ? $("remember").checked : true;
+    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    const cred = await signInWithPopup(auth, provider);
     user = cred.user;
+    paintWhoami();
     await afterCandidateLogin();
   }catch(e){
-    const b = $("goBtn"); if(b){ b.disabled = false; b.textContent = isSignup ? "Create account" : "Login" }
+    if(btn){ btn.disabled = false; btn.textContent = "Continue with Google" }
+    if(e.code === "auth/popup-blocked" || e.code === "auth/popup-closed-by-user")
+      return setErr("The Google window did not open. Allow pop-ups for this site and try again.");
+    if(e.code === "auth/operation-not-allowed")
+      return setErr("Google sign-in is not switched on yet for this project. Ask your examiner to enable it in Firebase.");
+    if(e.code === "auth/unauthorized-domain")
+      return setErr("This web address is not authorised in Firebase yet.");
     setErr(e.message || String(e));
   }
 }
@@ -383,8 +442,10 @@ async function candidateAuth(isSignup){
 const myName = () => user?.displayName || (user?.email || "").split("@")[0] || "Candidate";
 
 async function afterCandidateLogin(){
-  $("setupTitle").textContent = "Preparing your paper…";
-  $("setupBody").innerHTML = `<p class="small">Loading your questions…</p>`;
+  paintWhoami();
+  if(!roomId) return renderCandidateLogin();
+  $("setupTitle").textContent = "Preparing your paper\u2026";
+  $("setupBody").innerHTML = `<p class="small">Loading your questions\u2026</p>`;
   try{
     const token = await user.getIdToken();
     // No paperId sent: the API returns the paper already in progress, if any,
@@ -398,36 +459,10 @@ async function afterCandidateLogin(){
     PAPER = data.questions; paperId = data.paperId;
     localStorage.setItem("sscPaperId", paperId);
   }catch(e){
-    renderAuth("login"); setErr("Could not load your paper: " + e.message);
+    renderCandidateLogin(); setErr("Could not load your paper: " + e.message);
     return;
   }
-  if(roomId) return joinRoom();
-  restoreSolo();
-}
-
-// Solo runs have no server record, so progress lives in this browser.
-const SOLO_KEY = "sscSolo";
-function saveSolo(){
-  if(!roomData?.solo) return;
-  localStorage.setItem(SOLO_KEY, JSON.stringify({ paperId, section, localQ, answers, reviews, sectionStartAt }));
-}
-function restoreSolo(){
-  let s = null;
-  try{ s = JSON.parse(localStorage.getItem(SOLO_KEY) || "null") }catch{}
-  const resumable = s && s.paperId === paperId && s.sectionStartAt;
-  $("setupTitle").textContent = resumable ? "Welcome back, " + myName() : "Ready when you are, " + myName();
-  $("setupBody").innerHTML = `
-    <p class="small">100 questions · 4 sections × 15 minutes · +2 correct, −0.50 wrong.<br>
-    Each section gets its own 15 minutes and unused time does <b>not</b> carry over.</p>
-    ${resumable ? `<div class="notice">You have a test in progress — you were on ${esc(SECTIONS[s.section] || "")}, question ${(s.localQ || 0) + 1}.</div>` : ""}
-    <div class="actions">
-      ${resumable ? `<button class="primary" id="resumeSolo" style="flex:1">Resume test</button>` : ""}
-      <button class="${resumable ? "secondary" : "primary"}" id="startSolo" style="flex:1">${resumable ? "Start over" : "Start Practice Test"}</button>
-    </div>
-    <button class="ghost" id="logoutBtn" style="margin-top:10px">Sign out</button>`;
-  if(resumable) $("resumeSolo").onclick = () => startSolo(s);
-  $("startSolo").onclick = () => { localStorage.removeItem(SOLO_KEY); startSolo(null) };
-  $("logoutBtn").onclick = async () => { localStorage.removeItem(SOLO_KEY); localStorage.removeItem("sscPaperId"); await signOut(auth); location.reload() };
+  joinRoom();
 }
 
 /* ---------------------------- candidate: room ---------------------------- */
@@ -447,6 +482,7 @@ async function joinRoom(){
     answers = c.answers || {}; reviews = c.reviews || {};
     section = Number(c.section) || 0; localQ = Number(c.question) || 0;
     sectionStartAt = c.sectionStartAt || 0;
+    strikes = Number(c.strikes) || 0;
     if(c.status === "finished"){
       hide("setup"); show("candidate");
       examDone = true; $("timer").textContent = "DONE";
@@ -462,6 +498,16 @@ async function joinRoom(){
   }
   hide("setup"); show("candidate");
   $("myName").textContent = candidateData.name || myName();
+  const ok = await startMedia();
+  if(!ok){
+    $("candidateWaiting").innerHTML = `<h2>Camera and microphone required</h2>
+      <p class="small">This exam is proctored, so your camera and microphone must be switched on.
+      Allow access in your browser (the padlock in the address bar), then reload this page.</p>
+      <div class="actions"><button class="primary" onclick="location.reload()">Reload and allow</button></div>`;
+    show("candidateWaiting"); hide("candidateExam");
+    return;
+  }
+  armStrikeWatch(); armProctorAnswer(); watchChat();
   watchRoomForCandidate();
 }
 
@@ -497,21 +543,6 @@ function applyRoomState(){
   }else if(st === "finished"){ finishExam() }
 }
 
-function startSolo(saved){
-  roomData = { status:"running", solo:true };
-  candidateData = { name: myName() };
-  if(saved){
-    section = Number(saved.section) || 0; localQ = Number(saved.localQ) || 0;
-    answers = saved.answers || {}; reviews = saved.reviews || {};
-    sectionStartAt = saved.sectionStartAt;
-  }else{
-    section = 0; localQ = 0; answers = {}; reviews = {};
-    sectionStartAt = Date.now();
-  }
-  examDone = false;
-  hide("setup"); show("candidate"); hide("candidateWaiting"); show("candidateExam");
-  renderCandidate(); runTimer();
-}
 
 /* ------------------------------- timing ------------------------------- */
 // Each section gets a fresh 15 minutes. Time left over when a section is
@@ -537,7 +568,6 @@ function advanceSection(auto){
   if(section >= 3) return finishExam();
   section += 1; localQ = 0; sectionStartAt = Date.now();
   persist({ section, question:0, sectionStartAt });
-  saveSolo();
   renderCandidate();
   window.scrollTo(0,0);
   if(auto) flash(`Time up — moving to ${SECTIONS[section]}.`);
@@ -553,7 +583,6 @@ function flash(msg){
 
 /* ------------------------------ persistence ------------------------------ */
 function persist(extra){
-  if(roomData?.solo) return saveSolo();
   if(!roomId || !candidateId) return;
   update(ref(db, `rooms/${roomId}/candidates/${candidateId}`), {
     section, question: localQ, answers, reviews, status:"running",
@@ -613,8 +642,9 @@ async function finishExam(){
   show("candidateResult");
   $("timer").textContent = "DONE";
   $("candidateResult").innerHTML = `<div class="card"><h2>Scoring your paper…</h2></div>`;
-  if(!roomData?.solo) persist({ status:"finished", finishedAt: Date.now() });
-  localStorage.removeItem(SOLO_KEY);
+  persist({ status:"finished", finishedAt: Date.now() });
+  localStorage.removeItem("sscPaperId");
+  stopMedia();
   try{
     const token = await user.getIdToken();
     const r = await fetch(API + "/api/submit", {
@@ -684,6 +714,16 @@ window.revFilter = (mode, btn) => {
 };
 
 /* ------------------------------- examiner ------------------------------- */
+function renderAdminLogin(){
+  $("setupTitle").textContent = "Examiner Login";
+  $("setupBody").innerHTML = `
+    <label class="field"><span>Examiner email</span><input id="email" placeholder="you@example.com" autocomplete="username"></label>
+    <label class="field"><span>Password</span><input id="password" type="password" autocomplete="current-password"></label>
+    <div class="actions"><button class="primary" id="loginBtn" style="flex:1">Login</button></div>
+    <div id="loginErr"></div>`;
+  $("loginBtn").onclick = adminLogin;
+  $("password").onkeydown = e => { if(e.key === "Enter") adminLogin() };
+}
 async function adminLogin(){
   setErr("");
   const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
@@ -821,6 +861,10 @@ function watchRoomForAdmin(){
       $("candidateTimer").textContent = fmt((SECTION_MS - (Date.now() - candidateData.sectionStartAt)) / 1000);
     }else $("candidateTimer").textContent = roomData.status === "paused" ? "PAUSED" : "—";
     renderLiveTable(candidateData);
+    const st = Number(candidateData?.strikes || 0);
+    $("strikeCount").innerHTML = st ? `<span class="strike">${st} / ${MAX_STRIKES}</span>` : "0";
+    $("candUid").textContent = selectedCandidate || "—";
+    watchChatAdmin();
     $("startBtn").disabled = roomData.status !== "waiting";
     $("pauseBtn").disabled = !(roomData.status === "running" || roomData.status === "paused");
     $("pauseBtn").textContent = roomData.status === "paused" ? "Resume Exam" : "Pause Exam";
@@ -838,13 +882,17 @@ window.pickCandidate = id => {
   candidateId = id; candidateData = roomData?.candidates?.[id];
   renderCandidateList(roomData?.candidates || {}, Object.keys(roomData?.candidates || {}));
   refreshAdmin(); renderLiveTable(candidateData);
+  $("candUid").textContent = id;
+  window.stopCam();
 };
 function renderCandidateList(cs, ids){
   if(!ids.length) return $("candList").innerHTML = `<span class="small">No one has joined yet.</span>`;
   $("candList").innerHTML = ids.map(id => {
     const c = cs[id], att = Object.keys(c?.answers || {}).length;
     const done = c?.status === "finished" ? " ✓" : "";
-    return `<button class="candbtn ${id === selectedCandidate ? "sel" : ""}" onclick="window.pickCandidate('${id}')">${esc(c?.name || "Unnamed")} · ${att}/100${done}</button>`;
+    const st = Number(c?.strikes || 0);
+    const flag = st ? ` ⚠${st}` : "";
+    return `<button class="candbtn ${id === selectedCandidate ? "sel" : ""}" onclick="window.pickCandidate('${id}')">${esc(c?.name || "Unnamed")} · ${att}/100${done}${flag}</button>`;
   }).join("");
 }
 function renderLiveFeed(c){
@@ -904,6 +952,165 @@ function renderLiveTable(c){
   $("liveTable").innerHTML = html;
 }
 
+
+/* ------------------------- proctoring & messaging ------------------------- */
+// Candidate media, tab-switch strikes, chat, and an on-demand WebRTC feed the
+// examiner can open for one candidate at a time. Signalling rides on the
+// candidate's own database node, so no extra rules are needed.
+const MAX_STRIKES = 3;
+let localStream = null, pc = null, strikes = 0, strikeGuard = false, chatRef = null;
+let chatArmedFor = null, aChatRef = null;
+
+async function startMedia(){
+  try{
+    localStream = await navigator.mediaDevices.getUserMedia({ video:{ width:320, height:240 }, audio:true });
+    $("selfVideo").srcObject = localStream;
+    show("selfCam");
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+function stopMedia(){
+  localStream?.getTracks().forEach(t => t.stop());
+  localStream = null; hide("selfCam");
+  if(pc){ pc.close(); pc = null }
+}
+
+// Leaving the tab or window is counted; three is the limit.
+function armStrikeWatch(){
+  if(strikeGuard) return;
+  strikeGuard = true;
+  const bump = () => {
+    if(examDone || roomData?.status !== "running") return;
+    strikes += 1;
+    persist({ strikes });
+    if(strikes < MAX_STRIKES)
+      alert(`Warning ${strikes} of ${MAX_STRIKES}\n\nYou left the exam window. Your examiner has been notified.\nLeaving ${MAX_STRIKES - strikes} more time(s) will be flagged as malpractice.`);
+    else
+      alert(`Final warning\n\nYou have left the exam window ${strikes} times. This has been reported to your examiner.`);
+  };
+  document.addEventListener("visibilitychange", () => { if(document.hidden) bump() });
+  window.addEventListener("blur", () => { setTimeout(() => { if(!document.hasFocus()) bump() }, 400) });
+}
+
+/* ---- chat: candidate side ---- */
+function watchChat(){
+  if(!roomId || !candidateId) return;
+  if(chatRef) off(chatRef);
+  chatRef = ref(db, `rooms/${roomId}/candidates/${candidateId}/chat`);
+  onValue(chatRef, snap => {
+    const msgs = Object.values(snap.val() || {}).sort((a, b) => (a.at || 0) - (b.at || 0));
+    const box = $("chatLog");
+    if(!box) return;
+    if(!msgs.length){ box.innerHTML = `<span class="small">No messages yet. Ask your examiner anything here.</span>`; return }
+    box.innerHTML = msgs.map(m => `<div class="msg ${m.from === "admin" ? "them" : "me"}">${esc(m.text)}<span class="t">${m.from === "admin" ? "Examiner" : "You"}</span></div>`).join("");
+    box.scrollTop = box.scrollHeight;
+    const last = msgs[msgs.length - 1];
+    if(last.from === "admin") $("chatDot").classList.remove("hidden");
+  });
+}
+window.sendChat = () => {
+  const el = $("chatIn"), text = el.value.trim();
+  if(!text || !roomId || !candidateId) return;
+  push(ref(db, `rooms/${roomId}/candidates/${candidateId}/chat`), { from:"candidate", text, at: Date.now() });
+  el.value = "";
+  $("chatDot").classList.add("hidden");
+};
+
+/* ---- chat: examiner side ---- */
+function watchChatAdmin(){
+  const box = $("aChatLog");
+  if(!box) return;
+  if(!roomId || !selectedCandidate){ box.innerHTML = `<span class="small">Select a candidate to chat.</span>`; return }
+  if(chatArmedFor === selectedCandidate) return;
+  if(aChatRef) off(aChatRef);
+  chatArmedFor = selectedCandidate;
+  aChatRef = ref(db, `rooms/${roomId}/candidates/${selectedCandidate}/chat`);
+  onValue(aChatRef, snap => {
+    const msgs = Object.values(snap.val() || {}).sort((a, b) => (a.at || 0) - (b.at || 0));
+    if(!msgs.length){ box.innerHTML = `<span class="small">No messages yet.</span>`; return }
+    box.innerHTML = msgs.map(m => `<div class="msg ${m.from === "admin" ? "me" : "them"}">${esc(m.text)}<span class="t">${m.from === "admin" ? "You" : esc(candidateData?.name || "Candidate")}</span></div>`).join("");
+    box.scrollTop = box.scrollHeight;
+  });
+}
+window.sendChatAdmin = () => {
+  const el = $("aChatIn"), text = el.value.trim();
+  if(!text || !roomId || !selectedCandidate) return;
+  push(ref(db, `rooms/${roomId}/candidates/${selectedCandidate}/chat`), { from:"admin", text, at: Date.now() });
+  el.value = "";
+};
+window.lookupUid = async () => {
+  const uid = $("uidLookup").value.trim();
+  if(!uid || !roomId) return;
+  const snap = await get(ref(db, `rooms/${roomId}/candidates/${uid}`));
+  if(!snap.exists()) return alert("No candidate with that UID in room " + roomId + ".");
+  window.pickCandidate(uid);
+};
+
+/* ---- WebRTC: candidate answers whatever offer the examiner writes ---- */
+const RTC_CFG = { iceServers:[{ urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"] }] };
+function armProctorAnswer(){
+  if(!roomId || !candidateId) return;
+  const base = `rooms/${roomId}/candidates/${candidateId}/rtc`;
+  onValue(ref(db, base + "/offer"), async snap => {
+    const offer = snap.val();
+    if(!offer || !localStream) return;
+    if(pc) pc.close();
+    pc = new RTCPeerConnection(RTC_CFG);
+    localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+    pc.onicecandidate = e => { if(e.candidate) push(ref(db, base + "/calleeIce"), e.candidate.toJSON()) };
+    await pc.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await set(ref(db, base + "/answer"), { type: answer.type, sdp: answer.sdp });
+    onChildAdded(ref(db, base + "/callerIce"), s => {
+      const c = s.val(); if(c) pc.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
+    });
+  });
+}
+
+/* ---- WebRTC: examiner opens a feed on demand ---- */
+window.watchCam = async () => {
+  if(!roomId || !selectedCandidate) return alert("Select a candidate first.");
+  const base = `rooms/${roomId}/candidates/${selectedCandidate}/rtc`;
+  $("proStatus").textContent = "Connecting\u2026";
+  await remove(ref(db, base));
+  if(pc) pc.close();
+  pc = new RTCPeerConnection(RTC_CFG);
+  pc.addTransceiver("video", { direction:"recvonly" });
+  pc.addTransceiver("audio", { direction:"recvonly" });
+  pc.ontrack = e => {
+    $("proVideo").srcObject = e.streams[0];
+    show("proVideo");
+    $("proStatus").textContent = "Live feed from " + (candidateData?.name || "candidate") + ".";
+  };
+  pc.onicecandidate = e => { if(e.candidate) push(ref(db, base + "/callerIce"), e.candidate.toJSON()) };
+  pc.onconnectionstatechange = () => {
+    if(pc && ["failed","disconnected"].includes(pc.connectionState))
+      $("proStatus").textContent = "Feed dropped. The candidate may be offline, have denied camera access, or be on a network that blocks direct connections.";
+  };
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  await set(ref(db, base + "/offer"), { type: offer.type, sdp: offer.sdp });
+  onValue(ref(db, base + "/answer"), async s => {
+    const a = s.val();
+    if(a && pc && !pc.currentRemoteDescription) await pc.setRemoteDescription(new RTCSessionDescription(a)).catch(() => {});
+  });
+  onChildAdded(ref(db, base + "/calleeIce"), s => {
+    const c = s.val(); if(c && pc) pc.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
+  });
+};
+window.stopCam = async () => {
+  if(pc){ pc.close(); pc = null }
+  $("proVideo").srcObject = null; hide("proVideo");
+  $("proStatus").textContent = "Stopped watching.";
+  if(roomId && selectedCandidate) await remove(ref(db, `rooms/${roomId}/candidates/${selectedCandidate}/rtc`));
+};
+
+["chatIn","aChatIn"].forEach(id => { const el = $(id); if(el) el.onkeydown = e => {
+  if(e.key === "Enter") id === "chatIn" ? window.sendChat() : window.sendChatAdmin();
+}});
 window.createRoom = createRoom; window.startRoom = startRoom; window.finishRoom = finishRoom;
 window.copyRoom = copyRoom; window.togglePause = togglePause;
 boot();
