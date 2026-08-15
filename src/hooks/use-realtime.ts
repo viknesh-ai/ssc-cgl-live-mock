@@ -35,12 +35,15 @@ export function useRealtime({ enabled, roomCode, attemptId, onMessage }: Options
 
     const open = async () => {
       if (closed) return;
+      // Candidates present a Firebase token; examiners have a session cookie,
+      // which the browser sends with the upgrade request on its own. Either is
+      // enough, so a missing token must not stop us connecting.
       const token = await currentToken();
-      if (!token || closed) return;
+      if (closed) return;
 
       const url = new URL(WS_PATH, window.location.href);
       url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-      url.searchParams.set("token", token);
+      if (token) url.searchParams.set("token", token);
       if (roomCode) url.searchParams.set("room", roomCode);
       if (attemptId) url.searchParams.set("attempt", String(attemptId));
 
