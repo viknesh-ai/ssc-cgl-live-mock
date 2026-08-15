@@ -101,6 +101,9 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 .rev .o{padding:5px 9px;border-radius:6px;margin:3px 0;font-size:13.5px}
 .rev .o.right{background:#dcfce7;color:#14532d;font-weight:650}
 .rev .o.chosen{background:#fee2e2;color:#991b1b;font-weight:650}
+.tabs{display:flex;gap:6px;background:var(--line);padding:4px;border-radius:10px;margin-bottom:16px}
+.tab{flex:1;background:transparent;color:var(--muted);padding:9px;font-size:14px}
+.tab.on{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.1)}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
 .filters button{font-size:12.5px;padding:7px 12px}
 @media(max-width:860px){
@@ -142,6 +145,11 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
         <button class="green" onclick="joinRoomByCode()">Watch Room</button>
       </div>
       <p class="small" id="roomHint" style="margin:11px 0 0">Any number of examiners can watch the same room at once.</p>
+      <div style="margin-top:12px">
+        <div class="small" style="font-weight:650;margin-bottom:6px">All rooms (live)</div>
+        <div id="roomIndex" class="candlist"><span class="small">Loading…</span></div>
+      </div>
+      <button class="ghost" id="adminOut" style="margin-top:10px">Sign out</button>
     </div>
     <div class="card">
       <div class="monitor">
@@ -237,7 +245,7 @@ th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged,
-         setPersistence, browserLocalPersistence, browserSessionPersistence, signOut }
+         setPersistence, browserLocalPersistence, browserSessionPersistence, signOut, updateProfile }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { getDatabase, ref, get, set, update, onValue, off }
   from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
@@ -280,28 +288,48 @@ const currentQ = () => PAPER[sectionStart() + localQ];
 function setErr(msg){ const e=$("loginErr"); if(e) e.innerHTML = msg ? `<div class="error">${esc(msg)}</div>` : ""; }
 
 /* ------------------------------- boot ------------------------------- */
+// Reloading must not throw anyone back to a login screen they are already past,
+// so nothing renders until Firebase has told us whether a session is restored.
+let booted = false;
 async function boot(){
-  if(adminMode) return renderAdminLogin();
-  renderCandidateLogin();
+  $("setupTitle").textContent = "Loading…";
+  $("setupBody").innerHTML = `<p class="small">Restoring your session…</p>`;
+  onAuthStateChanged(auth, async u => {
+    if(booted) return;
+    booted = true;
+    user = u || null;
+    if(adminMode){
+      if(u) { hide("setup"); show("examiner"); await enterAdmin(); }
+      else renderAdminLogin();
+      return;
+    }
+    if(u) await afterCandidateLogin();
+    else renderAuth("login");
+  });
 }
 
-function renderCandidateLogin(){
-  $("setupTitle").textContent = "Sign in to start";
+// Two distinct screens: Register collects a name, Login only needs the number.
+function renderAuth(mode){
+  const isReg = mode === "register";
+  $("setupTitle").textContent = isReg ? "Create your account" : "Login";
   $("setupBody").innerHTML = `
-    <p class="small" style="margin-top:0">Use your phone number and a password. If you're new, create an account — it lets us make sure you never get the same questions twice.</p>
-    <label class="field"><span>Phone number</span><input id="phone" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="username"></label>
-    <label class="field"><span>Password</span><input id="pw" type="password" placeholder="At least 6 characters" autocomplete="current-password"></label>
-    <label class="small" style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-      <input type="checkbox" id="remember" checked style="width:auto"> Remember me on this device
-    </label>
-    <div class="actions">
-      <button class="primary" id="loginBtn" style="flex:1">Sign in</button>
-      <button class="secondary" id="signupBtn" style="flex:1">Create account</button>
+    <div class="tabs">
+      <button class="tab ${!isReg ? "on" : ""}" id="tabLogin">Login</button>
+      <button class="tab ${isReg ? "on" : ""}" id="tabReg">Register</button>
     </div>
+    ${isReg ? `<label class="field"><span>Your name</span><input id="nm" placeholder="Full name" autocomplete="name"></label>` : ""}
+    <label class="field"><span>Phone number</span><input id="phone" inputmode="numeric" placeholder="10-digit mobile number" autocomplete="username"></label>
+    <label class="field"><span>Password</span><input id="pw" type="password" placeholder="${isReg ? "At least 6 characters" : "Your password"}" autocomplete="${isReg ? "new-password" : "current-password"}"></label>
+    <label class="small" style="display:flex;gap:8px;align-items:center;margin:2px 0 6px">
+      <input type="checkbox" id="remember" checked style="width:auto"> Keep me signed in on this device
+    </label>
+    <div class="actions"><button class="primary" id="goBtn" style="flex:1">${isReg ? "Create account" : "Login"}</button></div>
+    <p class="small" style="margin-top:10px">${isReg ? "Already registered? Switch to Login." : "New here? Switch to Register — an account keeps track of which questions you have already seen."}</p>
     <div id="loginErr"></div>`;
-  $("loginBtn").onclick = () => candidateAuth(false);
-  $("signupBtn").onclick = () => candidateAuth(true);
-  $("pw").onkeydown = e => { if(e.key === "Enter") candidateAuth(false) };
+  $("tabLogin").onclick = () => renderAuth("login");
+  $("tabReg").onclick = () => renderAuth("register");
+  $("goBtn").onclick = () => candidateAuth(isReg);
+  $("pw").onkeydown = e => { if(e.key === "Enter") candidateAuth(isReg) };
 }
 
 function renderAdminLogin(){
@@ -316,12 +344,14 @@ function renderAdminLogin(){
 }
 
 async function candidateAuth(isSignup){
-  const phoneRaw = $("phone").value.trim();
-  const phone = phoneRaw.replace(/\D/g, "");
+  const phone = $("phone").value.trim().replace(/\D/g, "");
   const pw = $("pw").value;
+  const nm = isSignup ? ($("nm").value || "").trim() : "";
   setErr("");
+  if(isSignup && nm.length < 2) return setErr("Please enter your name.");
   if(phone.length < 10) return setErr("Enter a valid 10-digit phone number.");
   if(pw.length < 6) return setErr("Password must be at least 6 characters.");
+  const btn = $("goBtn"); btn.disabled = true; btn.textContent = "Please wait…";
   try{
     await setPersistence(auth, $("remember").checked ? browserLocalPersistence : browserSessionPersistence);
     const email = phoneToEmail(phone);
@@ -329,51 +359,79 @@ async function candidateAuth(isSignup){
     if(isSignup){
       try{ cred = await createUserWithEmailAndPassword(auth, email, pw); }
       catch(e){
-        if(e.code === "auth/email-already-in-use") return setErr("That number already has an account. Use Sign in instead.");
+        if(e.code === "auth/email-already-in-use"){ btn.disabled=false; btn.textContent="Create account"; return setErr("That number is already registered. Switch to Login."); }
         throw e;
       }
+      await updateProfile(cred.user, { displayName: nm });
     }else{
       try{ cred = await signInWithEmailAndPassword(auth, email, pw); }
       catch(e){
-        if(e.code === "auth/invalid-credential" || e.code === "auth/user-not-found")
-          return setErr("No account found for that number and password. Use Create account if you're new.");
-        if(e.code === "auth/wrong-password") return setErr("Wrong password.");
+        btn.disabled = false; btn.textContent = "Login";
+        if(e.code === "auth/invalid-credential" || e.code === "auth/user-not-found" || e.code === "auth/wrong-password")
+          return setErr("Wrong number or password. If you have not registered yet, switch to Register.");
         throw e;
       }
     }
     user = cred.user;
-    await afterCandidateLogin(phone);
-  }catch(e){ setErr(e.message || String(e)) }
+    await afterCandidateLogin();
+  }catch(e){
+    const b = $("goBtn"); if(b){ b.disabled = false; b.textContent = isSignup ? "Create account" : "Login" }
+    setErr(e.message || String(e));
+  }
 }
 
-async function afterCandidateLogin(phone){
+const myName = () => user?.displayName || (user?.email || "").split("@")[0] || "Candidate";
+
+async function afterCandidateLogin(){
   $("setupTitle").textContent = "Preparing your paper…";
-  $("setupBody").innerHTML = `<p class="small">Drawing 100 questions you haven't seen before.</p>`;
+  $("setupBody").innerHTML = `<p class="small">Loading your questions…</p>`;
   try{
     const token = await user.getIdToken();
-    const r = await fetch(API + "/api/paper", { method:"POST", headers:{ Authorization:"Bearer " + token } });
+    // No paperId sent: the API returns the paper already in progress, if any,
+    // so a reload never reshuffles the exam.
+    const r = await fetch(API + "/api/paper", {
+      method:"POST", headers:{ Authorization:"Bearer " + token, "Content-Type":"application/json" },
+      body: JSON.stringify({ paperId: localStorage.getItem("sscPaperId") || undefined })
+    });
     if(!r.ok) throw new Error("Could not load questions (" + r.status + ")");
     const data = await r.json();
     PAPER = data.questions; paperId = data.paperId;
+    localStorage.setItem("sscPaperId", paperId);
   }catch(e){
-    $("setupTitle").textContent = "Sign in to start";
-    renderCandidateLogin(); setErr("Could not load your paper: " + e.message);
+    renderAuth("login"); setErr("Could not load your paper: " + e.message);
     return;
   }
-  if(roomId) return joinRoom(phone);
-  // No room in the URL: offer a solo practice run.
-  $("setupTitle").textContent = "Ready when you are";
+  if(roomId) return joinRoom();
+  restoreSolo();
+}
+
+// Solo runs have no server record, so progress lives in this browser.
+const SOLO_KEY = "sscSolo";
+function saveSolo(){
+  if(!roomData?.solo) return;
+  localStorage.setItem(SOLO_KEY, JSON.stringify({ paperId, section, localQ, answers, reviews, sectionStartAt }));
+}
+function restoreSolo(){
+  let s = null;
+  try{ s = JSON.parse(localStorage.getItem(SOLO_KEY) || "null") }catch{}
+  const resumable = s && s.paperId === paperId && s.sectionStartAt;
+  $("setupTitle").textContent = resumable ? "Welcome back, " + myName() : "Ready when you are, " + myName();
   $("setupBody").innerHTML = `
     <p class="small">100 questions · 4 sections × 15 minutes · +2 correct, −0.50 wrong.<br>
     Each section gets its own 15 minutes and unused time does <b>not</b> carry over.</p>
-    <div class="actions"><button class="primary" id="startSolo" style="flex:1">Start Practice Test</button></div>
-    <button class="ghost" id="logoutBtn" style="margin-top:8px">Sign out</button>`;
-  $("startSolo").onclick = startSolo;
-  $("logoutBtn").onclick = async () => { await signOut(auth); location.reload() };
+    ${resumable ? `<div class="notice">You have a test in progress — you were on ${esc(SECTIONS[s.section] || "")}, question ${(s.localQ || 0) + 1}.</div>` : ""}
+    <div class="actions">
+      ${resumable ? `<button class="primary" id="resumeSolo" style="flex:1">Resume test</button>` : ""}
+      <button class="${resumable ? "secondary" : "primary"}" id="startSolo" style="flex:1">${resumable ? "Start over" : "Start Practice Test"}</button>
+    </div>
+    <button class="ghost" id="logoutBtn" style="margin-top:10px">Sign out</button>`;
+  if(resumable) $("resumeSolo").onclick = () => startSolo(s);
+  $("startSolo").onclick = () => { localStorage.removeItem(SOLO_KEY); startSolo(null) };
+  $("logoutBtn").onclick = async () => { localStorage.removeItem(SOLO_KEY); localStorage.removeItem("sscPaperId"); await signOut(auth); location.reload() };
 }
 
 /* ---------------------------- candidate: room ---------------------------- */
-async function joinRoom(phone){
+async function joinRoom(){
   candidateId = user.uid;
   const snap = await get(ref(db, `rooms/${roomId}/meta`));
   if(!snap.exists()){
@@ -381,11 +439,29 @@ async function joinRoom(phone){
     $("setupBody").innerHTML = `<div class="error">That room code doesn't exist. Ask your examiner for a fresh link.</div>`;
     return;
   }
-  candidateData = { name: phone, phone, status:"waiting", section:0, question:0,
-                    answers:{}, reviews:{}, qids: PAPER.map(q=>q.id), paperId, joinedAt: Date.now() };
-  await set(ref(db, `rooms/${roomId}/candidates/${candidateId}`), candidateData);
+  // Rejoining after a reload must restore the existing record, never blank it.
+  const mine = await get(ref(db, `rooms/${roomId}/candidates/${candidateId}`));
+  if(mine.exists()){
+    const c = mine.val();
+    candidateData = c;
+    answers = c.answers || {}; reviews = c.reviews || {};
+    section = Number(c.section) || 0; localQ = Number(c.question) || 0;
+    sectionStartAt = c.sectionStartAt || 0;
+    if(c.status === "finished"){
+      hide("setup"); show("candidate");
+      examDone = true; $("timer").textContent = "DONE";
+      show("candidateResult");
+      $("candidateResult").innerHTML = `<div class="card"><h2>You have already submitted this test</h2><p class="small">Your paper was handed in. Ask your examiner for your score.</p></div>`;
+      return;
+    }
+  }else{
+    candidateData = { name: myName(), phone: (user.email || "").split("@")[0], status:"waiting",
+                      section:0, question:0, answers:{}, reviews:{},
+                      qids: PAPER.map(q => q.id), paperId, joinedAt: Date.now() };
+    await set(ref(db, `rooms/${roomId}/candidates/${candidateId}`), candidateData);
+  }
   hide("setup"); show("candidate");
-  $("myName").textContent = phone;
+  $("myName").textContent = candidateData.name || myName();
   watchRoomForCandidate();
 }
 
@@ -421,11 +497,18 @@ function applyRoomState(){
   }else if(st === "finished"){ finishExam() }
 }
 
-function startSolo(){
+function startSolo(saved){
   roomData = { status:"running", solo:true };
-  candidateData = { name:"Practice" };
-  section = 0; localQ = 0; answers = {}; reviews = {};
-  sectionStartAt = Date.now(); examDone = false;
+  candidateData = { name: myName() };
+  if(saved){
+    section = Number(saved.section) || 0; localQ = Number(saved.localQ) || 0;
+    answers = saved.answers || {}; reviews = saved.reviews || {};
+    sectionStartAt = saved.sectionStartAt;
+  }else{
+    section = 0; localQ = 0; answers = {}; reviews = {};
+    sectionStartAt = Date.now();
+  }
+  examDone = false;
   hide("setup"); show("candidate"); hide("candidateWaiting"); show("candidateExam");
   renderCandidate(); runTimer();
 }
@@ -454,6 +537,7 @@ function advanceSection(auto){
   if(section >= 3) return finishExam();
   section += 1; localQ = 0; sectionStartAt = Date.now();
   persist({ section, question:0, sectionStartAt });
+  saveSolo();
   renderCandidate();
   window.scrollTo(0,0);
   if(auto) flash(`Time up — moving to ${SECTIONS[section]}.`);
@@ -469,7 +553,8 @@ function flash(msg){
 
 /* ------------------------------ persistence ------------------------------ */
 function persist(extra){
-  if(!roomId || !candidateId || roomData?.solo) return;
+  if(roomData?.solo) return saveSolo();
+  if(!roomId || !candidateId) return;
   update(ref(db, `rooms/${roomId}/candidates/${candidateId}`), {
     section, question: localQ, answers, reviews, status:"running",
     name: candidateData?.name, lastSeen: Date.now(), ...(extra || {})
@@ -529,6 +614,7 @@ async function finishExam(){
   $("timer").textContent = "DONE";
   $("candidateResult").innerHTML = `<div class="card"><h2>Scoring your paper…</h2></div>`;
   if(!roomData?.solo) persist({ status:"finished", finishedAt: Date.now() });
+  localStorage.removeItem(SOLO_KEY);
   try{
     const token = await user.getIdToken();
     const r = await fetch(API + "/api/submit", {
@@ -600,24 +686,51 @@ window.revFilter = (mode, btn) => {
 /* ------------------------------- examiner ------------------------------- */
 async function adminLogin(){
   setErr("");
+  const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
   try{
     const c = await signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value);
     user = c.user; hide("setup"); show("examiner");
-    try{
-      const token = await user.getIdToken();
-      const r = await fetch(API + "/api/bank", { method:"POST", headers:{ Authorization:"Bearer " + token } });
-      if(r.ok) adminBank = new Map((await r.json()).questions.map(q => [String(q.id), q]));
-    }catch(e){ /* dashboard still works, just without right/wrong marking */ }
-    let target = roomId || localStorage.getItem("sscRoomId");
-    if(target){
-      const s = await get(ref(db, `rooms/${target}/meta`));
-      if(!s.exists() || s.val()?.status === "finished"){ localStorage.removeItem("sscRoomId"); target = null }
-    }
-    if(!target) target = await findActiveRoom();
-    if(target) await attachRoom(target, true);
-    else $("roomHint").textContent = "No active room. Create one, or enter a code to watch an exam another examiner started.";
-  }catch(e){ setErr("Login failed: " + (e.message || e)) }
+    await enterAdmin();
+  }catch(e){
+    btn.disabled = false; btn.textContent = "Login";
+    setErr("Login failed: " + (e.message || e));
+  }
 }
+// Shared by a fresh login and a restored session after reload.
+async function enterAdmin(){
+  try{
+    const token = await user.getIdToken();
+    const r = await fetch(API + "/api/bank", { method:"POST", headers:{ Authorization:"Bearer " + token } });
+    if(r.ok) adminBank = new Map((await r.json()).questions.map(q => [String(q.id), q]));
+  }catch(e){ /* dashboard still works, just without right/wrong marking */ }
+  watchRoomIndex();
+  $("adminOut").onclick = async () => { localStorage.removeItem("sscRoomId"); await signOut(auth); location.reload() };
+  let target = roomId || localStorage.getItem("sscRoomId");
+  if(target){
+    const s = await get(ref(db, `rooms/${target}/meta`));
+    if(!s.exists() || s.val()?.status === "finished"){ localStorage.removeItem("sscRoomId"); target = null }
+  }
+  if(!target) target = await findActiveRoom();
+  if(target) await attachRoom(target, true);
+  else $("roomHint").textContent = "No active room. Create one, or pick one below.";
+}
+// Every examiner watches the room index live, so a room another examiner
+// creates shows up here immediately rather than after a reload.
+function watchRoomIndex(){
+  onValue(ref(db, "rooms"), snap => {
+    const rooms = snap.val() || {};
+    const entries = Object.entries(rooms)
+      .filter(([, r]) => r && r.meta)
+      .sort((a, b) => (b[1].meta.createdAt || 0) - (a[1].meta.createdAt || 0));
+    if(!entries.length) return $("roomIndex").innerHTML = `<span class="small">No rooms yet.</span>`;
+    $("roomIndex").innerHTML = entries.map(([id, r]) => {
+      const n = Object.keys(r.candidates || {}).length;
+      const st = r.meta.status || "?";
+      return `<button class="candbtn ${id === roomId ? "sel" : ""}" onclick="window.watchRoom('${id}')">${id} · ${st} · ${n} candidate${n === 1 ? "" : "s"}</button>`;
+    }).join("");
+  });
+}
+window.watchRoom = id => attachRoom(id, true);
 async function findActiveRoom(){
   try{
     const snap = await get(ref(db, "rooms"));
@@ -656,6 +769,7 @@ async function createRoom(){
 }
 async function startRoom(){
   if(!roomId) return;
+  $("startBtn").disabled = true; $("roomStatus").textContent = "starting…";
   const startAt = Date.now();
   await update(ref(db, `rooms/${roomId}/meta`), { status:"running", startAt, pausedAt:null });
   // Give everyone already waiting a fresh 15-minute first section.
@@ -667,6 +781,7 @@ async function startRoom(){
 // forward by exactly how long the pause lasted, so nobody loses time.
 async function togglePause(){
   if(!roomId || !roomData) return;
+  const pb = $("pauseBtn"); pb.disabled = true; pb.textContent = "Working…";
   if(roomData.status === "running"){
     await update(ref(db, `rooms/${roomId}/meta`), { status:"paused", pausedAt: Date.now() });
   }else if(roomData.status === "paused"){
@@ -791,7 +906,6 @@ function renderLiveTable(c){
 
 window.createRoom = createRoom; window.startRoom = startRoom; window.finishRoom = finishRoom;
 window.copyRoom = copyRoom; window.togglePause = togglePause;
-onAuthStateChanged(auth, u => { if(u && !user) user = u });
 boot();
 </script>
 </body>

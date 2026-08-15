@@ -134,20 +134,36 @@ export default {
       return json({ ok: true, bank: BANK.length, perSection: SECTIONS.map(s => ({ sec: s, count: BANK.filter(q => q.sec === s).length })) });
     }
 
-    // Issue a paper. Questions only — never the key.
+    // Issue a paper, or hand back the one already in progress. Questions only —
+    // never the key. Resuming matters because a student who reloads mid-exam
+    // must get the same questions back, not a fresh draw.
     if (path === "/api/paper" && request.method === "POST") {
       const claims = await verifyIdToken(bearer(request));
       if (!claims) return json({ error: "unauthenticated" }, 401);
       const uid = claims.sub;
+      const body = await request.json().catch(() => ({}));
+      const byId = new Map(BANK.map(q => [String(q.id), q]));
+
+      // An explicit paperId, or whichever paper this student currently has open.
+      const wanted = body.paperId || await env.EXAM.get("active:" + uid);
+      if (wanted && !body.fresh) {
+        const rec = JSON.parse(await env.EXAM.get("paper:" + wanted) || "null");
+        if (rec && rec.uid === uid) {
+          const questions = rec.ids.map(id => byId.get(String(id))).filter(Boolean).map(stripKey);
+          if (questions.length) return json({ paperId: wanted, resumed: true, recycled: [], questions });
+        }
+      }
+
       let seen = [];
       try { seen = JSON.parse(await env.EXAM.get("seen:" + uid) || "[]"); } catch {}
       const { picked, recycled } = drawPaper(seen);
       const ids = picked.map(q => q.id);
       const paperId = crypto.randomUUID();
       await env.EXAM.put("paper:" + paperId, JSON.stringify({ uid, ids, at: Date.now() }), { expirationTtl: 60 * 60 * 24 * 7 });
+      await env.EXAM.put("active:" + uid, paperId, { expirationTtl: 60 * 60 * 24 * 2 });
       const merged = Array.from(new Set([...(recycled.length ? [] : seen), ...ids]));
       await env.EXAM.put("seen:" + uid, JSON.stringify(merged));
-      return json({ paperId, recycled, questions: picked.map(stripKey) });
+      return json({ paperId, resumed: false, recycled, questions: picked.map(stripKey) });
     }
 
     // Score a submitted paper and hand back the key for review.
@@ -158,6 +174,8 @@ export default {
       const rec = JSON.parse(await env.EXAM.get("paper:" + body.paperId) || "null");
       if (!rec) return json({ error: "unknown paper" }, 404);
       if (rec.uid !== claims.sub) return json({ error: "not your paper" }, 403);
+      // The paper is done, so the next request should draw a fresh one.
+      await env.EXAM.delete("active:" + claims.sub);
       const result = score(rec.ids, body.answers || {});
       const key = {};
       const byId = new Map(BANK.map(q => [String(q.id), q]));
