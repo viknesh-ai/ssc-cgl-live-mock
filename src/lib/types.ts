@@ -156,6 +156,7 @@ export type ExamView = {
   slug: string;
   name: string;
   description: string | null;
+  region: string | null;
   correctMark: number;
   wrongMark: number;
   sections: { id: number; order: number; name: string; shortName: string; questionCount: number }[];

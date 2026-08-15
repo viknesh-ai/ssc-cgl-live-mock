@@ -20,6 +20,7 @@ the examiner console.
 | Identity | Firebase (Google) for candidates, signed session cookie for examiners |
 | Proctoring | WebRTC (STUN, optional TURN) with a snapshot fallback |
 | AI review | EURI chat-completions (`gemini-2.5-pro` by default) |
+| Documents | `unpdf` and `mammoth`, in memory — uploads are never stored |
 | Hosting | Railway — one web service plus the Postgres database |
 
 Everything runs in one process on one port: Next.js serves the pages and the
@@ -173,27 +174,69 @@ src/lib/                   Exam rules, scoring, auth, EURI client
 src/server/                Websocket server and connection registry
 ```
 
-## The examiner console
+## The three faces of the app
 
-`/admin`, behind the shared examiner login:
+**The public site** — `/`, `/exams`, `/exams/[slug]`, `/pricing`, `/careers`.
+Anyone can browse the exams on offer; signing in with Google gives a candidate
+`/dashboard`, where they start a paper or join a supervised session by code.
 
-- **Sessions** — create a session from a paper, share its code, and invigilate:
-  live candidate table, answer sheet marked as they work, camera, chat, and
-  start/pause/end controls.
-- **Papers** — create and edit blueprints. Each section gets its own question
-  count, duration and optional topic filter, and the page shows how many
-  published questions the bank actually holds for it.
+**The proctoring console** — `/admin`, behind the shared examiner login. Only
+about running sittings: create a session from a paper, share its code, then
+watch the candidate table, the answer sheet marked as they work, their camera,
+and the message thread, with start/pause/end controls.
+
+**The studio** — `/studio`, behind the same login, and deliberately not linked
+from anywhere. This is where content is made:
+
+- **Exams** — create an exam with its own sections and marking, from a preset
+  (SSC, banking, UPSC, SAT, GRE, IELTS) or from scratch.
+- **Papers** — blueprints over an exam: questions per section, minutes per
+  section, optional topic filter, and whether the bank can actually supply it.
 - **Question bank** — filter by section, topic, difficulty, status or text;
-  write and edit questions; bulk import by pasting JSON; see how each question
-  has performed. Questions that have already been served are retired to drafts
-  rather than deleted, so past results keep their questions.
+  write and edit questions; see how each has performed in real attempts.
+- **Import** — upload a question paper as PDF, Word or text.
+
+Questions and papers that have already been used are retired to drafts or
+archived rather than deleted, so past results keep their questions.
+
+## Importing a question paper
+
+`/studio/import` takes a PDF, a `.docx` or a plain text file up to 8 MB. The
+file is read into memory, converted to text, parsed, and dropped — **it is never
+written to disk or to the database**. What is stored is the questions the
+examiner confirms, and their explanations.
+
+The expected layout, per question:
+
+```
+Section: Quantitative Aptitude
+
+1. A train 180 m long crosses a pole in 12 seconds. What is its speed?
+(A) 54 km/h
+(B) 60 km/h
+(C) 45 km/h
+(D) 72 km/h
+Answer: A
+Explanation: Speed = 180 / 12 = 15 m/s = 54 km/h.
+Topic: Speed and distance
+Difficulty: Easy
+```
+
+Numbering may be `1.`, `1)`, `Q1.` or `Q.1`; options may be `(A)`, `A)`, `A.` or
+lower case; the answer may be a letter, a number, or the option's own text.
+`Section` applies to every question after it until changed. `Explanation`,
+`Topic` and `Difficulty` are optional — an explanation supplied here is stored
+with the question, so no AI call is needed for it later.
+
+Everything found is shown for checking before anything is saved: section
+assignment can be corrected per question, individual questions skipped, and
+anything the parser could not read is listed with the reason. Scanned PDFs hold
+no text and must be run through OCR first.
 
 ## Adding another exam
 
-Exams are rows, not code. Insert an `Exam` with its `ExamSection`s (or extend
-`prisma/seed.ts`), add questions to the bank against those sections, then create
-a paper over them. `APP_NAME` in `src/lib/brand.ts` is the only naming constant
-left in the source.
+Exams are rows, not code — create one in the studio. `APP_NAME` in
+`src/lib/brand.ts` is the only naming constant left in the source.
 
 ## Notes
 

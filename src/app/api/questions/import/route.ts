@@ -20,6 +20,8 @@ const schema = z.object({
         answerIndex: z.number().int().min(0),
         topic: z.string().trim().max(80).nullable().optional(),
         difficulty: z.enum(["EASY", "MEDIUM", "HARD"]).nullable().optional(),
+        /** Worked solution supplied with the question, used instead of asking the AI. */
+        explanation: z.string().trim().max(4000).nullable().optional(),
       }),
     )
     .min(1)
@@ -67,7 +69,7 @@ export const POST = route(async (req) => {
       continue;
     }
 
-    await prisma.question.create({
+    const question = await prisma.question.create({
       data: {
         examId: body.examId,
         sectionId,
@@ -79,6 +81,12 @@ export const POST = route(async (req) => {
         status: body.status,
       },
     });
+    // An explanation that came with the question saves an AI call later.
+    if (q.explanation) {
+      await prisma.explanation.create({
+        data: { questionId: question.id, content: q.explanation, model: "imported" },
+      });
+    }
     created++;
   }
 

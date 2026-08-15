@@ -145,6 +145,7 @@ export async function listExams(): Promise<ExamView[]> {
     slug: exam.slug,
     name: exam.name,
     description: exam.description,
+    region: exam.region,
     correctMark: exam.correctMark,
     wrongMark: exam.wrongMark,
     sections: exam.sections.map((s) => ({

@@ -73,6 +73,8 @@ model Exam {
   slug        String   @unique
   name        String
   description String?
+  /// Where the exam is sat — used to group the public catalogue.
+  region      String?
   correctMark Float    @default(2)
   wrongMark   Float    @default(-0.5)
   archived    Boolean  @default(false)

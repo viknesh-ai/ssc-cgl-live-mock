@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ConsoleShell } from "@/components/admin/console-shell";
+import { StudioShell } from "@/components/studio/studio-shell";
 import { QuestionEditor, type QuestionDraft } from "@/components/admin/question-editor";
 import { QuestionImport } from "@/components/admin/question-import";
 import {
@@ -116,7 +116,7 @@ export default function QuestionBankPage() {
   };
 
   return (
-    <ConsoleShell
+    <StudioShell
       title="Question bank"
       description="Everything candidates can be asked. Papers draw from here, so a question added now is in the next session."
       actions={
@@ -370,7 +370,7 @@ export default function QuestionBankPage() {
         onCancel={() => setConfirmDelete(null)}
         onConfirm={() => confirmDelete && void remove(confirmDelete)}
       />
-    </ConsoleShell>
+    </StudioShell>
   );
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ConsoleShell } from "@/components/admin/console-shell";
+import { StudioShell } from "@/components/studio/studio-shell";
 import {
   Badge,
   Button,
@@ -128,7 +128,7 @@ export default function PapersPage() {
   const exam = exams.find((e) => e.id === draft?.examId);
 
   return (
-    <ConsoleShell
+    <StudioShell
       title="Papers"
       description="A paper says how many questions to draw from each section and how long each section runs. Candidates each get their own draw from the bank."
       actions={
@@ -339,6 +339,6 @@ export default function PapersPage() {
         onCancel={() => setConfirmDelete(null)}
         onConfirm={() => confirmDelete && void remove(confirmDelete)}
       />
-    </ConsoleShell>
+    </StudioShell>
   );
 }

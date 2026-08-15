@@ -4,7 +4,7 @@ const config: NextConfig = {
   reactStrictMode: true,
   // The Prisma client and the pg driver are Node-only; keep them out of the
   // bundler so the server build does not try to trace their native pieces.
-  serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg", "pg"],
+  serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg", "pg", "unpdf", "mammoth"],
 
   /**
    * Serve Firebase's sign-in handler from our own domain.

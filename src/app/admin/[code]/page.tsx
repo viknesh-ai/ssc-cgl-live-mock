@@ -155,8 +155,8 @@ export default function AdminRoomPage({ params }: { params: Promise<{ code: stri
         <main className="mx-auto max-w-md px-5 py-20">
           <Notice tone="bad">Examiner access only.</Notice>
           <div className="mt-5">
-            <Link href="/">
-              <Button>Back to home</Button>
+            <Link href="/admin">
+              <Button>Back to sessions</Button>
             </Link>
           </div>
         </main>

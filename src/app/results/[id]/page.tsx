@@ -61,8 +61,8 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
         <main className="mx-auto max-w-md px-5 py-20">
           <Notice tone="bad">{error ?? "Result unavailable."}</Notice>
           <div className="mt-5">
-            <Link href="/">
-              <Button>Back to home</Button>
+            <Link href="/dashboard">
+              <Button>My papers</Button>
             </Link>
           </div>
         </main>
