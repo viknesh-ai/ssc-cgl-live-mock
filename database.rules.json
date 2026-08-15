@@ -3,8 +3,10 @@
     "rooms": {
       ".read": "auth != null && auth.token.email == 'jeyaviknesh@gmail.com'",
       "$roomId": {
-        ".read": "auth != null",
         ".write": "auth != null && auth.token.email == 'jeyaviknesh@gmail.com'",
+        "meta": {
+          ".read": "auth != null"
+        },
         "candidates": {
           "$uid": {
             ".read": "auth != null && (auth.uid == $uid || auth.token.email == 'jeyaviknesh@gmail.com')",

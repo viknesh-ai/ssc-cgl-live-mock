@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ssc-cgl-exam-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+  "observability": { "enabled": true },
+  "kv_namespaces": [
+    {
+      "binding": "EXAM",
+      "id": "5921df9341a44f029f2c65d1f2407f84"
+    }
+  ]
+}
