@@ -12,7 +12,9 @@ import { attachRealtime } from "@/server/realtime";
 
 const dev = process.env.NODE_ENV !== "production";
 const port = Number(process.env.PORT ?? 3000);
-const hostname = process.env.HOSTNAME ?? "0.0.0.0";
+// Not HOSTNAME: container runtimes set that to the container id, and binding to
+// it makes the app unreachable from the platform's proxy and health checks.
+const hostname = process.env.BIND_HOST ?? "0.0.0.0";
 
 async function main() {
   loadLocalEnv();
