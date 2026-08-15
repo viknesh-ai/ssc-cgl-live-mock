@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { HttpError } from "@/lib/auth-server";
 import { DEFAULT_SECTION_MINUTES, generateRoomCode } from "@/lib/exam";
+import { DEFAULT_PAPER } from "@/lib/brand";
 import { getAttempt, submitAttempt, syncClock } from "@/lib/attempt";
 import type { RoomView } from "@/lib/types";
 import type { Room, User } from "@/generated/prisma/client";
@@ -14,7 +15,7 @@ export async function createRoom(examiner: User, title?: string): Promise<Room> 
     return prisma.room.create({
       data: {
         code,
-        title: title?.trim() || "SSC CGL Tier-I Mock",
+        title: title?.trim() || `${DEFAULT_PAPER.name} mock`,
         examinerId: examiner.id,
         sectionMinutes: DEFAULT_SECTION_MINUTES,
       },

@@ -85,9 +85,7 @@ export function PanelHeader({
 
 export function Label({ children }: { children: ReactNode }) {
   return (
-    <span className="text-[11px] font-semibold uppercase tracking-[0.07em] text-ink-3">
-      {children}
-    </span>
+<span className="eyebrow">{children}</span>
   );
 }
 
@@ -110,7 +108,7 @@ export function Stat({
   return (
     <div className="px-5 py-3.5">
       <Label>{label}</Label>
-      <div className={cx("tabular mt-1 text-xl font-semibold tracking-tight", toneClass)}>
+      <div className={cx("tabular mt-1 font-display text-xl tracking-tight", toneClass)}>
         {value}
       </div>
     </div>
@@ -212,7 +210,7 @@ export function ConfirmDialog({
         className="w-full max-w-md rounded-lg border border-line bg-surface p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-base font-semibold tracking-tight text-ink">{title}</h2>
+        <h2 className="font-display text-lg tracking-tight text-ink">{title}</h2>
         <div className="mt-2 text-[13.5px] leading-relaxed text-ink-2">{body}</div>
         <div className="mt-6 flex justify-end gap-2">
           <Button onClick={onCancel}>{cancelLabel}</Button>

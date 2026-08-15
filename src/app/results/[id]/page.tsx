@@ -78,7 +78,7 @@ export default function ResultsPage({ params }: { params: Promise<{ id: string }
 
       <main className="mx-auto max-w-6xl space-y-5 px-5 py-8">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">Paper marked</h1>
+          <h1 className="font-display text-3xl tracking-tight text-ink">Paper marked</h1>
           <p className="mt-1 text-[14px] text-ink-2">
             {data.result.submittedAt
               ? new Date(data.result.submittedAt).toLocaleString(undefined, {

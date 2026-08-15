@@ -52,7 +52,7 @@ export function AttemptLoader({
       <div className="min-h-full">
         <AppHeader />
         <main className="mx-auto max-w-md px-5 py-20 text-center">
-          <h1 className="text-xl font-semibold tracking-tight text-ink">Sign in to continue</h1>
+          <h1 className="font-display text-2xl tracking-tight text-ink">Sign in to continue</h1>
           <p className="mt-2 text-[14px] text-ink-2">{signInPrompt}</p>
           <div className="mt-6">
             <Button variant="primary" onClick={() => void signIn()}>

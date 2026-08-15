@@ -80,8 +80,17 @@ function bearerToken(req: Request): string | null {
   return match ? match[1] : null;
 }
 
-/** Resolves the signed-in user for an API route, or throws a 401. */
+/**
+ * Resolves the signed-in user for an API route, or throws a 401.
+ *
+ * Two ways in: a Firebase ID token (candidates, signed in with Google) or an
+ * examiner session cookie (the shared examiner login).
+ */
 export async function requireUser(req: Request): Promise<User> {
+  const { sessionCookieFrom, userFromSessionToken } = await import("@/lib/admin-session");
+  const examiner = await userFromSessionToken(sessionCookieFrom(req.headers.get("cookie")));
+  if (examiner) return examiner;
+
   const claims = await verifyIdToken(bearerToken(req));
   if (!claims) throw new HttpError(401, "Please sign in again.");
   return userFromClaims(claims);

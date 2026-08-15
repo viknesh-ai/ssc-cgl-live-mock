@@ -52,7 +52,11 @@ export function firebaseAuth(): Promise<Auth | null> {
       }
     }
     if (!isComplete(config)) return null;
-    const app = getApps().length ? getApp() : initializeApp(config);
+    // Sign in through our own domain (next.config.ts proxies /__/auth to
+    // Firebase), so the flow is first-party and works on phones too.
+    const app = getApps().length
+      ? getApp()
+      : initializeApp({ ...config, authDomain: window.location.host });
     return getAuth(app);
   })();
   return authPromise;

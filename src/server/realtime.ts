@@ -10,6 +10,7 @@ import type { Duplex } from "node:stream";
 import { WebSocketServer, type WebSocket } from "ws";
 import { prisma } from "@/lib/prisma";
 import { userFromClaims, verifyIdToken } from "@/lib/auth-server";
+import { sessionCookieFrom, userFromSessionToken } from "@/lib/admin-session";
 import { WS_PATH, type ClientMessage, type ServerMessage } from "@/lib/realtime-protocol";
 import { hub, type Connection } from "@/server/hub";
 
@@ -28,7 +29,7 @@ export function attachRealtime(server: HttpServer) {
     // The token is checked before the handshake completes, so an unauthenticated
     // client never gets a socket at all.
     void (async () => {
-      const session = await authenticate(url).catch((err) => {
+      const session = await authenticate(url, req.headers.cookie).catch((err) => {
         console.error("[ws] auth failed", err);
         return null;
       });
@@ -80,11 +81,16 @@ type Session = {
 };
 
 /** Resolves who is connecting and what they are allowed to watch. */
-async function authenticate(url: URL): Promise<Session | null> {
-  const claims = await verifyIdToken(url.searchParams.get("token"));
-  if (!claims) return null;
+async function authenticate(url: URL, cookieHeader?: string): Promise<Session | null> {
+  // Examiners arrive with a session cookie, candidates with a Firebase token.
+  const examiner = await userFromSessionToken(sessionCookieFrom(cookieHeader));
+  let user = examiner;
+  if (!user) {
+    const claims = await verifyIdToken(url.searchParams.get("token"));
+    if (!claims) return null;
+    user = await userFromClaims(claims);
+  }
 
-  const user = await userFromClaims(claims);
   const roomCode = url.searchParams.get("room")?.toUpperCase() || null;
   const attemptParam = Number(url.searchParams.get("attempt")) || null;
 

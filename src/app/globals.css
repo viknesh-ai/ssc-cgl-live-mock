@@ -1,40 +1,42 @@
 @import "tailwindcss";
 
 /*
- * One quiet palette, used consistently:
- *   ink       — text and primary actions
- *   accent    — the single interactive blue (selection, focus, links)
- *   ok/warn/bad — reserved for real meaning: correct, caution, wrong
- * Colour is information here, not decoration, so nothing else is tinted.
+ * The look is examination stationery: warm paper, dark ink, one navy accent,
+ * and hairline rules instead of shadows. Colour carries meaning — navy for
+ * anything interactive, green/amber/red only for correct, caution and wrong —
+ * so nothing is tinted for decoration.
  */
 @theme {
-  --color-canvas: #f5f6f8;
+  --color-canvas: #f3f1ec;
   --color-surface: #ffffff;
-  --color-subtle: #fafbfc;
-  --color-line: #e5e7eb;
-  --color-line-strong: #cfd4dc;
+  --color-subtle: #faf9f5;
+  --color-line: #e5e2d9;
+  --color-line-strong: #ccc7ba;
 
-  --color-ink: #16181d;
-  --color-ink-2: #545c6b;
-  --color-ink-3: #8a919e;
+  --color-ink: #1a1917;
+  --color-ink-2: #56534b;
+  --color-ink-3: #8a857a;
 
-  --color-accent: #1d4ed8;
-  --color-accent-soft: #eef3ff;
+  --color-accent: #1e3a6e;
+  --color-accent-soft: #eaeff8;
 
-  --color-ok: #067647;
-  --color-ok-soft: #ecfdf3;
-  --color-warn: #b54708;
-  --color-warn-soft: #fffaeb;
-  --color-bad: #b42318;
-  --color-bad-soft: #fef3f2;
+  --color-ok: #146c43;
+  --color-ok-soft: #e9f4ed;
+  --color-warn: #96570a;
+  --color-warn-soft: #fcf3e2;
+  --color-bad: #a52a1f;
+  --color-bad-soft: #fbeeeb;
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 7px;
 
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  /* Headings in a serif: it reads as an examination document, not a dashboard. */
+  --font-display:
+    ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-mono: ui-mono, ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
 html,
@@ -56,6 +58,15 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Small capitals for field labels and table headings. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
 button,
 input,
 textarea,
@@ -72,7 +83,6 @@ select {
   background: var(--color-accent-soft);
 }
 
-/* Scrollable panes keep a slim, unobtrusive scrollbar. */
 .thin-scroll {
   scrollbar-width: thin;
   scrollbar-color: var(--color-line-strong) transparent;

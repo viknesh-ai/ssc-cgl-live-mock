@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useAuth } from "@/components/auth-provider";
+import { Wordmark } from "@/components/wordmark";
 import { Button, cx } from "@/components/ui";
 
 /**
- * One header everywhere. The right-hand slot is where a page puts the thing
- * that must always be visible — the exam clock, or the room status.
+ * One header everywhere. The right-hand slot holds whatever must stay visible
+ * on that page — the exam clock, or the room's connection state.
  */
 export function AppHeader({
   subtitle,
@@ -23,16 +24,19 @@ export function AppHeader({
     <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
       <div
         className={cx(
-          "mx-auto flex items-center justify-between gap-4 px-5",
-          compact ? "h-14 max-w-none" : "h-14 max-w-6xl",
+          "mx-auto flex h-14 items-center justify-between gap-4 px-5",
+          compact ? "max-w-none" : "max-w-6xl",
         )}
       >
-        <div className="flex min-w-0 items-baseline gap-3">
-          <Link href="/" className="text-sm font-semibold tracking-tight text-ink">
-            SSC CGL Tier-I Mock
+        <div className="flex min-w-0 items-center gap-3">
+          <Link href="/" aria-label="Home">
+            <Wordmark />
           </Link>
           {subtitle ? (
-            <span className="hidden truncate text-[13px] text-ink-2 sm:block">{subtitle}</span>
+            <>
+              <span aria-hidden className="h-4 w-px bg-line-strong" />
+              <span className="hidden truncate text-[13px] text-ink-2 sm:block">{subtitle}</span>
+            </>
           ) : null}
         </div>
 
